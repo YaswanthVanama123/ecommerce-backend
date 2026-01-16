@@ -1,0 +1,309 @@
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃         REQUEST/RESPONSE FLOW WITH OPTIMIZATION MIDDLEWARE          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+                           ┌─────────────┐
+                           │   CLIENT    │
+                           │  Request    │
+                           └──────┬──────┘
+                                  │
+                                  ▼
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║                    INCOMING REQUEST                           ║
+    ╚═══════════════════════════════════════════════════════════════╝
+                                  │
+                                  ▼
+    ┌─────────────────────────────────────────────────────────────┐
+    │ Phase 1: PERFORMANCE & SECURITY (Pre-parsing)               │
+    ├─────────────────────────────────────────────────────────────┤
+    │  1. Performance Monitor       → Start timing                │
+    │  2. Response Time Middleware  → Track response time         │
+    │  3. Compression Middleware    → Prepare compression         │
+    │  4. Helmet (Security)         → Add security headers        │
+    │  5. CORS                      → Handle cross-origin         │
+    └─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+    ┌─────────────────────────────────────────────────────────────┐
+    │ Phase 2: REQUEST PARSING & VALIDATION                       │
+    ├─────────────────────────────────────────────────────────────┤
+    │  6. Request Size Limiter      → Check body size (10KB)     │
+    │  7. URL Encoded Parser        → Parse URL encoded          │
+    │  8. Body Validation           → Additional validation      │
+    └─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+    ┌─────────────────────────────────────────────────────────────┐
+    │ Phase 3: SECURITY & SANITIZATION                            │
+    ├─────────────────────────────────────────────────────────────┤
+    │  9. Mongo Sanitize            → Prevent NoSQL injection    │
+    │ 10. XSS Clean                 → Prevent XSS attacks        │
+    │ 11. HPP                       → Prevent param pollution    │
+    │ 12. Rate Limiter              → Check request rate         │
+    │ 13. Body Sanitization         → Clean request data         │
+    └─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+    ┌─────────────────────────────────────────────────────────────┐
+    │ Phase 4: RESPONSE OPTIMIZATION SETUP                        │
+    ├─────────────────────────────────────────────────────────────┤
+    │ 14. Cache Control             → Set cache headers          │
+    │ 15. ETag Middleware           → Prepare ETag handling      │
+    │ 16. Last-Modified             → Prepare date checking      │
+    │ 17. Size Monitor              → Prepare size tracking      │
+    │ 18. Streaming                 → Add streaming methods      │
+    │ 19. Field Filtering           → Prepare field filtering    │
+    │ 20. JSON Optimization         → Prepare JSON optimization  │
+    │ 21. HTTP/2 Hints              → Add resource hints         │
+    └─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+    ┌─────────────────────────────────────────────────────────────┐
+    │ Phase 5: APPLICATION ROUTING                                │
+    ├─────────────────────────────────────────────────────────────┤
+    │  → /api/auth         → Authentication                       │
+    │  → /api/products     → Products API                         │
+    │  → /api/categories   → Categories API                       │
+    │  → /api/cart         → Shopping Cart                        │
+    │  → /api/orders       → Orders                               │
+    │  → /api/admin        → Admin Panel                          │
+    │  → /health           → Health Check                         │
+    └─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║                   CONTROLLER LOGIC                            ║
+    ║  • Database queries                                           ║
+    ║  • Business logic                                             ║
+    ║  • Generate response data                                     ║
+    ╚═══════════════════════════════════════════════════════════════╝
+                                  │
+                                  ▼
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║                   RESPONSE PROCESSING                         ║
+    ╚═══════════════════════════════════════════════════════════════╝
+                                  │
+                                  ▼
+    ┌─────────────────────────────────────────────────────────────┐
+    │ Response Optimization (Automatic)                           │
+    ├─────────────────────────────────────────────────────────────┤
+    │  ✓ Field Filtering    → Remove unwanted fields             │
+    │  ✓ JSON Optimization  → Remove null/undefined values       │
+    │  ✓ ETag Generation    → Generate ETag hash                 │
+    │  ✓ Last-Modified      → Set modification date              │
+    │  ✓ Cache Headers      → Add Cache-Control                  │
+    │  ✓ Size Tracking      → Measure response size              │
+    │  ✓ HTTP/2 Hints       → Add Link headers                   │
+    └─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+    ┌─────────────────────────────────────────────────────────────┐
+    │ Conditional Response Check                                  │
+    ├─────────────────────────────────────────────────────────────┤
+    │  If-None-Match matches ETag? ────────┐                     │
+    │  If-Modified-Since < Last-Modified? ──┼─→ YES → 304        │
+    │                                        │                     │
+    │                                      NO                     │
+    │                                        ▼                     │
+    │                                  Continue                   │
+    └─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+    ┌─────────────────────────────────────────────────────────────┐
+    │ Compression (if applicable)                                 │
+    ├─────────────────────────────────────────────────────────────┤
+    │  ✓ Check Accept-Encoding                                   │
+    │  ✓ Response size > 1KB?                                    │
+    │  ✓ Content type compressible?                              │
+    │  → Apply gzip/deflate compression                          │
+    │  → Add Content-Encoding header                             │
+    └─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+    ┌─────────────────────────────────────────────────────────────┐
+    │ Final Response Headers                                      │
+    ├─────────────────────────────────────────────────────────────┤
+    │  Content-Type: application/json                            │
+    │  Content-Encoding: gzip                                    │
+    │  Content-Length: 25600                                     │
+    │  ETag: "W/abc123"                                          │
+    │  Last-Modified: Wed, 15 Jan 2025...                        │
+    │  Cache-Control: public, max-age=300                        │
+    │  X-Response-Time: 45.67ms                                  │
+    │  Access-Control-Allow-Origin: *                            │
+    └─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+    ┌─────────────────────────────────────────────────────────────┐
+    │ Performance Logging                                         │
+    ├─────────────────────────────────────────────────────────────┤
+    │  [Performance] GET /api/products - 45.67ms - 25KB - 200    │
+    │                                                             │
+    │  Metrics collected:                                         │
+    │  • Request method & path                                   │
+    │  • Response time                                           │
+    │  • Response size                                           │
+    │  • Status code                                             │
+    │  • User agent                                              │
+    │  • IP address                                              │
+    └─────────────────────────────────────────────────────────────┘
+                                  │
+                                  ▼
+    ╔═══════════════════════════════════════════════════════════════╗
+    ║                    OUTGOING RESPONSE                          ║
+    ╚═══════════════════════════════════════════════════════════════╝
+                                  │
+                                  ▼
+                           ┌─────────────┐
+                           │   CLIENT    │
+                           │  Receives   │
+                           └─────────────┘
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                    OPTIMIZATION DECISION TREE                        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+    ┌─────────────────┐
+    │ Response Ready  │
+    └────────┬────────┘
+             │
+             ▼
+    ┌────────────────────┐
+    │ Check ETag/        │
+    │ If-None-Match      │
+    └────┬───────────┬───┘
+         │ Match     │ No Match
+         ▼           ▼
+    ┌─────────┐   ┌──────────────────────┐
+    │ Return  │   │ Check Last-Modified/ │
+    │ 304     │   │ If-Modified-Since    │
+    └─────────┘   └──────┬───────────┬───┘
+                         │ Not       │ Modified
+                         │ Modified  │
+                         ▼           ▼
+                    ┌─────────┐   ┌──────────────┐
+                    │ Return  │   │ Apply Field  │
+                    │ 304     │   │ Filtering    │
+                    └─────────┘   └──────┬───────┘
+                                         │
+                                         ▼
+                                  ┌──────────────┐
+                                  │ JSON         │
+                                  │ Optimization │
+                                  └──────┬───────┘
+                                         │
+                                         ▼
+                                  ┌──────────────┐
+                                  │ Generate     │
+                                  │ ETag         │
+                                  └──────┬───────┘
+                                         │
+                                         ▼
+                                  ┌──────────────┐
+                                  │ Size > 1KB?  │
+                                  └──┬───────┬───┘
+                                     │ Yes   │ No
+                                     ▼       ▼
+                              ┌──────────┐  ┌──────────┐
+                              │ Compress │  │ Send Raw │
+                              └────┬─────┘  └────┬─────┘
+                                   │             │
+                                   └──────┬──────┘
+                                          ▼
+                                    ┌──────────┐
+                                    │  CLIENT  │
+                                    └──────────┘
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                       BANDWIDTH OPTIMIZATION                         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+    Original Response: 100KB
+    ┌────────────────────────────────────────────────────────────┐
+    │████████████████████████████████████████████████████████████│ 100KB
+    └────────────────────────────────────────────────────────────┘
+
+    After Field Filtering: 60KB (-40%)
+    ┌──────────────────────────────────────────────┐
+    │████████████████████████████████████████████  │ 60KB
+    └──────────────────────────────────────────────┘
+
+    After JSON Optimization: 50KB (-50%)
+    ┌────────────────────────────────────────────┐
+    │████████████████████████████████████████    │ 50KB
+    └────────────────────────────────────────────┘
+
+    After Compression: 15KB (-85%)
+    ┌──────────────┐
+    │██████████████│ 15KB
+    └──────────────┘
+
+    Cached Response (304): 0.5KB (-99.5%)
+    ┌┐
+    ││ 0.5KB
+    └┘
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                     RESPONSE TIME BREAKDOWN                          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+    Typical Request Timeline:
+
+    0ms     ┌─────────────────────────────────────────────────────┐
+            │ Request received                                    │
+    2ms     ├─────────────────────────────────────────────────────┤
+            │ Security & validation (10ms)                        │
+    12ms    ├─────────────────────────────────────────────────────┤
+            │ Database query (30ms)                               │
+    42ms    ├─────────────────────────────────────────────────────┤
+            │ Field filtering (2ms)                               │
+    44ms    ├─────────────────────────────────────────────────────┤
+            │ JSON optimization (1ms)                             │
+    45ms    ├─────────────────────────────────────────────────────┤
+            │ Compression (5ms)                                   │
+    50ms    ├─────────────────────────────────────────────────────┤
+            │ Response sent                                       │
+            └─────────────────────────────────────────────────────┘
+
+    Total: 50ms (vs 150ms without optimization = 66% faster)
+
+    Cached Request Timeline:
+
+    0ms     ┌──────┐
+            │ ETag │
+    2ms     └──────┘
+
+    Total: 2ms (304 Not Modified) = 96% faster!
+
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                         MONITORING & METRICS                         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+    Console Output:
+
+    [Performance] GET /api/products - 45.67ms - 25.6KB - 200
+    [Performance] GET /api/categories - 12.34ms - 5.2KB - 200
+    [Performance] POST /api/cart - 89.23ms - 2.1KB - 201
+    Slow request detected: GET /api/orders - 1234.56ms
+    Large response detected: GET /api/products/search - 2.45MB
+
+    Headers Sent:
+
+    Content-Type: application/json
+    Content-Encoding: gzip
+    Content-Length: 25600
+    ETag: "W/abc123def456"
+    Last-Modified: Wed, 15 Jan 2025 10:30:00 GMT
+    Cache-Control: public, max-age=300, must-revalidate
+    X-Response-Time: 45.67ms
+    X-Content-Type-Options: nosniff
+    X-Frame-Options: DENY
+    Strict-Transport-Security: max-age=31536000
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃ Total optimization achieved: Up to 99.5% bandwidth & 96% faster!    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
