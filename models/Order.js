@@ -29,11 +29,11 @@ const orderItemSchema = new mongoose.Schema({
 });
 
 const shippingAddressSchema = new mongoose.Schema({
-  firstName: {
+  fullName: {
     type: String,
     required: true
   },
-  lastName: {
+  phone: {
     type: String,
     required: true
   },
@@ -50,17 +50,13 @@ const shippingAddressSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  pincode: {
+  zipCode: {
     type: String,
     required: true
   },
   country: {
     type: String,
     default: 'India'
-  },
-  phone: {
-    type: String,
-    required: true
   }
 });
 

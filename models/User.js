@@ -2,10 +2,20 @@ import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 
 const addressSchema = new mongoose.Schema({
+  fullName: {
+    type: String,
+    required: true,
+    trim: true
+  },
+  phone: {
+    type: String,
+    required: true,
+    trim: true
+  },
   type: {
     type: String,
-    enum: ['home', 'work', 'other'],
-    default: 'home'
+    enum: ['Home', 'Work', 'Other'],
+    default: 'Home'
   },
   addressLine1: {
     type: String,
@@ -20,9 +30,10 @@ const addressSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  pincode: {
+  zipCode: {
     type: String,
-    required: true
+    required: true,
+    alias: 'pincode'
   },
   country: {
     type: String,

@@ -42,12 +42,14 @@ const sampleUsers = [
     phone: '9876543210',
     role: 'superadmin',
     addresses: [{
-      type: 'home',
+      fullName: 'Super Admin',
+      phone: '9876543210',
+      type: 'Home',
       addressLine1: 'Superadmin Towers, Tech Park',
       addressLine2: 'Block 1, Floor 5',
       city: 'Bangalore',
       state: 'Karnataka',
-      pincode: '560001',
+      zipCode: '560001',
       country: 'India',
       isDefault: true
     }]
@@ -60,12 +62,14 @@ const sampleUsers = [
     phone: '9876543211',
     role: 'admin',
     addresses: [{
-      type: 'work',
+      fullName: 'Admin One',
+      phone: '9876543211',
+      type: 'Work',
       addressLine1: 'Admin Plaza, Business District',
       addressLine2: 'Suite 100',
       city: 'Mumbai',
       state: 'Maharashtra',
-      pincode: '400001',
+      zipCode: '400001',
       country: 'India',
       isDefault: true
     }]
@@ -78,11 +82,13 @@ const sampleUsers = [
     phone: '9876543212',
     role: 'admin',
     addresses: [{
-      type: 'home',
+      fullName: 'Admin Two',
+      phone: '9876543212',
+      type: 'Home',
       addressLine1: 'Admin Gardens, IT Zone',
       city: 'Delhi',
       state: 'Delhi',
-      pincode: '110001',
+      zipCode: '110001',
       country: 'India',
       isDefault: true
     }]
@@ -109,12 +115,14 @@ const generateRegularUsers = () => {
     password: 'User@1234',
     role: 'user',
     addresses: [{
-      type: 'home',
+      fullName: `${user.firstName} ${user.lastName}`,
+      phone: user.phone,
+      type: 'Home',
       addressLine1: `${Math.floor(Math.random() * 1000)} Main Street`,
       addressLine2: 'Apt ' + (Math.floor(Math.random() * 100) + 1),
       city: user.city,
       state: user.state,
-      pincode: user.pincode,
+      zipCode: user.pincode,
       country: 'India',
       isDefault: true
     }]
@@ -123,33 +131,33 @@ const generateRegularUsers = () => {
 
 const sampleCategories = [
   {
-    name: "Men's Clothing",
-    description: 'Latest trends in mens fashion including shirts, pants, jackets and more',
-    image: 'https://via.placeholder.com/300x300?text=Mens+Clothing',
+    name: 'Women',
+    description: 'Stylish womens apparel including dresses, tops, sarees, kurtas and ethnic wear',
+    image: 'https://via.placeholder.com/300x300?text=Women',
     order: 1
   },
   {
-    name: "Women's Clothing",
-    description: 'Stylish womens apparel including dresses, tops, sarees and traditional wear',
-    image: 'https://via.placeholder.com/300x300?text=Womens+Clothing',
+    name: 'Men',
+    description: 'Latest trends in mens fashion including shirts, pants, t-shirts, jeans and formal wear',
+    image: 'https://via.placeholder.com/300x300?text=Men',
     order: 2
   },
   {
-    name: 'Electronics',
-    description: 'Latest gadgets and electronics including phones, laptops, and accessories',
-    image: 'https://via.placeholder.com/300x300?text=Electronics',
+    name: 'Kids',
+    description: 'Fun and comfortable clothing for boys and girls of all ages',
+    image: 'https://via.placeholder.com/300x300?text=Kids',
     order: 3
   },
   {
     name: 'Accessories',
-    description: 'Premium accessories including bags, belts, watches and jewelry',
+    description: 'Premium accessories including bags, belts, watches, jewelry and sunglasses',
     image: 'https://via.placeholder.com/300x300?text=Accessories',
     order: 4
   },
   {
-    name: 'Shoes',
-    description: 'Comfortable and stylish footwear for all occasions',
-    image: 'https://via.placeholder.com/300x300?text=Shoes',
+    name: 'Footwear',
+    description: 'Trendy footwear collection including shoes, sandals, heels and sneakers',
+    image: 'https://via.placeholder.com/300x300?text=Footwear',
     order: 5
   }
 ];

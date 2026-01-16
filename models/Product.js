@@ -66,6 +66,15 @@ const productSchema = new mongoose.Schema({
   subCategory: {
     type: String
   },
+  gender: {
+    type: String,
+    enum: ['Women', 'Men', 'Kids', 'Unisex'],
+    default: 'Unisex'
+  },
+  material: {
+    type: String,
+    trim: true
+  },
   brand: {
     type: String,
     trim: true

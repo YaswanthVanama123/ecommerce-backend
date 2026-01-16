@@ -49,6 +49,11 @@ export const getProducts = async (req, res, next) => {
       filter.brand = req.query.brand;
     }
 
+    // Gender filter
+    if (req.query.gender) {
+      filter.gender = req.query.gender;
+    }
+
     // Size filter
     if (req.query.size) {
       filter.sizes = req.query.size;
@@ -96,7 +101,7 @@ export const getProducts = async (req, res, next) => {
     // Optimized query with .lean() for read-only data
     // Select only necessary fields to reduce data transfer
     const productsQuery = Product.find(filter)
-      .select('name slug description price discountPrice images category brand sizes colors stock ratings isFeatured isActive createdAt')
+      .select('name slug description price discountPrice discountPercentage images category brand gender sizes colors stock ratings isFeatured isActive createdAt')
       .populate('category', 'name slug') // Only populate necessary fields
       .sort(sort)
       .limit(limit)
