@@ -79,7 +79,8 @@ export const validate = (schema, source = 'body') => {
 
       next();
     } catch (err) {
-      return sendError(res, 500, 'Validation error', err.message);
+      console.error('[VALIDATION ERROR]', err);
+      return sendError(res, 500, 'Validation error', err.message || 'An error occurred during validation');
     }
   };
 };
@@ -125,7 +126,8 @@ export const validateMultiple = (schemas) => {
 
       next();
     } catch (err) {
-      return sendError(res, 500, 'Validation error', err.message);
+      console.error('[VALIDATION ERROR]', err);
+      return sendError(res, 500, 'Validation error', err.message || 'An error occurred during validation');
     }
   };
 };

@@ -17,7 +17,7 @@ import productValidator from '../validators/productValidator.js';
 
 const router = express.Router();
 
-router.get('/featured', validate(productValidator.getFeatured, 'query'), getFeaturedProducts);
+router.get('/featured', getFeaturedProducts);
 router.get('/', validate(productValidator.getProducts, 'query'), getProducts);
 router.get('/:id', validate(productValidator.id, 'params'), getProductById);
 router.post('/', protect, isAdmin, validate(productValidator.create, 'body'), createProduct);
