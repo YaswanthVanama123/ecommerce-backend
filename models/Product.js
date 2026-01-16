@@ -129,13 +129,12 @@ const productSchema = new mongoose.Schema({
 });
 
 // Calculate discount percentage when discountPrice is set
-productSchema.pre('save', function(next) {
+productSchema.pre('save', function() {
   if (this.discountPrice && this.discountPrice < this.price) {
     this.discountPercentage = Math.round(((this.price - this.discountPrice) / this.price) * 100);
   } else {
     this.discountPercentage = 0;
   }
-  next();
 });
 
 // Update rating average when reviews change

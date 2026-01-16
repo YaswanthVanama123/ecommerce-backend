@@ -30,6 +30,11 @@ export const protect = async (req, res, next) => {
         return next(new Error('User account is inactive'));
       }
 
+      // Set role from token (more efficient than database lookup)
+      if (decoded.role) {
+        req.user.role = decoded.role;
+      }
+
       next();
     } catch (error) {
       res.status(401);

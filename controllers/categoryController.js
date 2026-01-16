@@ -18,7 +18,8 @@ export const getCategories = async (req, res, next) => {
     // Cache miss - fetch from database
     const categories = await Category.find({ isActive: true })
       .populate('parentCategory', 'name slug')
-      .sort({ order: 1, name: 1 });
+      .sort({ order: 1, name: 1 })
+      .lean();
 
     // Cache for 1 hour
     cacheManager.set(cacheKey, categories, TTL.ONE_HOUR);
@@ -44,7 +45,8 @@ export const getCategoryById = async (req, res, next) => {
 
     // Cache miss - fetch from database
     const category = await Category.findById(req.params.id)
-      .populate('parentCategory', 'name slug');
+      .populate('parentCategory', 'name slug')
+      .lean();
 
     if (!category) {
       return sendError(res, 404, 'Category not found');
@@ -85,7 +87,7 @@ export const createCategory = async (req, res, next) => {
     cacheManager.delete(CACHE_KEYS.CATEGORY_TREE);
     cacheManager.deletePattern(`${CACHE_KEYS.CATEGORY}:*`);
 
-    sendSuccess(res, 201, category, 'Category created successfully');
+    sendSuccess(res, 201, category.toObject(), 'Category created successfully');
   } catch (error) {
     next(error);
   }
@@ -127,7 +129,7 @@ export const updateCategory = async (req, res, next) => {
     cacheManager.delete(`${CACHE_KEYS.CATEGORY}:${req.params.id}`);
     cacheManager.deletePattern(`${CACHE_KEYS.CATEGORY}:*`);
 
-    sendSuccess(res, 200, updatedCategory, 'Category updated successfully');
+    sendSuccess(res, 200, updatedCategory.toObject(), 'Category updated successfully');
   } catch (error) {
     next(error);
   }

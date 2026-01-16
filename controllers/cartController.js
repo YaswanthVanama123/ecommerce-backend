@@ -6,6 +6,25 @@ import { sendSuccess, sendError } from '../utils/apiResponse.js';
 const cartValidationCache = new Map();
 const CACHE_TTL = 60000; // 1 minute TTL
 
+// Helper function to add subtotal to cart items
+const addSubtotalToCartItems = (cart) => {
+  if (!cart || !cart.items || cart.items.length === 0) {
+    return cart;
+  }
+
+  cart.items = cart.items.map(item => {
+    const price = item.price || 0;
+    const subtotal = price * item.quantity;
+
+    return {
+      ...item,
+      subtotal
+    };
+  });
+
+  return cart;
+};
+
 // Helper function to get cached validation
 const getCachedValidation = (productId, size, color) => {
   const key = `${productId}-${size}-${color}`;
@@ -59,14 +78,17 @@ export const getCart = async (req, res, next) => {
       );
     }
 
-    // Calculate totals efficiently
+    // Calculate totals efficiently and add subtotal to each item
     let total = 0;
     let totalItems = 0;
 
     if (cart.items && cart.items.length > 0) {
+      // Add subtotal to each item
+      cart = addSubtotalToCartItems(cart);
+
+      // Calculate totals
       for (const item of cart.items) {
-        const price = item.price || 0;
-        total += price * item.quantity;
+        total += item.subtotal || 0;
         totalItems += item.quantity;
       }
     }
@@ -168,12 +190,15 @@ export const addToCart = async (req, res, next) => {
       let total = 0;
       let totalItems = 0;
 
-      for (const item of newCart.items) {
-        total += item.price * item.quantity;
+      // Add subtotal to items
+      const cartWithSubtotal = addSubtotalToCartItems(newCart);
+
+      for (const item of cartWithSubtotal.items) {
+        total += item.subtotal || 0;
         totalItems += item.quantity;
       }
 
-      return sendSuccess(res, 200, { cart: newCart, total, totalItems }, 'Item added to cart successfully');
+      return sendSuccess(res, 200, { cart: cartWithSubtotal, total, totalItems }, 'Item added to cart successfully');
     }
 
     // Populate the updated cart
@@ -186,12 +211,15 @@ export const addToCart = async (req, res, next) => {
     let total = 0;
     let totalItems = 0;
 
-    for (const item of cart.items) {
-      total += item.price * item.quantity;
+    // Add subtotal to items
+    const cartWithSubtotal = addSubtotalToCartItems(cart);
+
+    for (const item of cartWithSubtotal.items) {
+      total += item.subtotal || 0;
       totalItems += item.quantity;
     }
 
-    sendSuccess(res, 200, { cart, total, totalItems }, 'Item added to cart successfully');
+    sendSuccess(res, 200, { cart: cartWithSubtotal, total, totalItems }, 'Item added to cart successfully');
   } catch (error) {
     next(error);
   }

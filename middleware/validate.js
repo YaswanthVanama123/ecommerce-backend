@@ -33,6 +33,10 @@ export const validate = (schema, source = 'body') => {
           dataToValidate = req.body;
       }
 
+      console.log('\n[VALIDATION] Validating request data...');
+      console.log('Source:', source);
+      console.log('Data being validated:', JSON.stringify(dataToValidate, null, 2));
+
       // Validate data against schema
       const { error, value } = schema.validate(dataToValidate, {
         abortEarly: false,
@@ -56,30 +60,42 @@ export const validate = (schema, source = 'body') => {
 
       // If validation errors exist
       if (error) {
-        const messages = error.details.map(detail => ({
-          field: detail.path.join('.'),
-          message: detail.message
-        }));
+        console.error('\n[VALIDATION FAILED]');
+        const messages = error.details.map(detail => {
+          console.error(`  - Field: ${detail.path.join('.')}`);
+          console.error(`    Message: ${detail.message}`);
+          console.error(`    Type: ${detail.type}`);
+          return {
+            field: detail.path.join('.'),
+            message: detail.message
+          };
+        });
+        console.error('\n');
 
         return sendError(res, 400, 'Validation failed', messages);
       }
+
+      console.log('[VALIDATION] Validation passed successfully\n');
 
       // Replace request data with validated data
       if (source === 'body') {
         req.body = value;
       } else if (source === 'query') {
-        req.query = value;
+        // req.query is read-only, can't replace it
+        // Just validate without replacing
+        console.log('[VALIDATION] Query validated successfully (not replaced as req.query is read-only)');
       } else if (source === 'params') {
         req.params = value;
       } else if (source === 'all') {
         req.body = value.body;
-        req.query = value.query;
+        // req.query = value.query; // Can't set query
         req.params = value.params;
       }
 
       next();
     } catch (err) {
-      console.error('[VALIDATION ERROR]', err);
+      console.error('[VALIDATION ERROR] Exception:', err);
+      console.error('[VALIDATION ERROR] Stack:', err.stack);
       return sendError(res, 500, 'Validation error', err.message || 'An error occurred during validation');
     }
   };
@@ -114,7 +130,7 @@ export const validateMultiple = (schemas) => {
             allErrors.push(...messages);
           } else {
             if (source === 'body') req.body = value;
-            if (source === 'query') req.query = value;
+            // if (source === 'query') req.query = value; // Can't set query (read-only)
             if (source === 'params') req.params = value;
           }
         }
@@ -126,7 +142,8 @@ export const validateMultiple = (schemas) => {
 
       next();
     } catch (err) {
-      console.error('[VALIDATION ERROR]', err);
+      console.error('[VALIDATION ERROR] Exception in validateMultiple:', err);
+      console.error('[VALIDATION ERROR] Stack:', err.stack);
       return sendError(res, 500, 'Validation error', err.message || 'An error occurred during validation');
     }
   };

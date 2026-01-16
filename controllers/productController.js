@@ -1,4 +1,5 @@
 import Product from '../models/Product.js';
+import Category from '../models/Category.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
 import cloudinary, {
   uploadMultipleFiles,
@@ -32,9 +33,27 @@ export const getProducts = async (req, res, next) => {
     // Build filter object using indexed fields
     const filter = { isActive: true };
 
-    // Category filter (indexed field)
+    // Category filter - lookup by slug to get ObjectId
     if (req.query.category) {
-      filter.category = req.query.category;
+      const category = await Category.findOne({
+        slug: req.query.category.toLowerCase(),
+        isActive: true
+      }).select('_id').lean();
+
+      if (category) {
+        filter.category = category._id;
+      } else {
+        // If category not found, return empty results
+        return sendSuccess(res, 200, {
+          products: [],
+          pagination: {
+            page,
+            limit,
+            totalPages: 0,
+            totalProducts: 0
+          }
+        }, 'No products found');
+      }
     }
 
     // Price range filter (indexed field)

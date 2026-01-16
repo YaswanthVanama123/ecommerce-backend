@@ -33,12 +33,18 @@ const priceSchema = Joi.number()
 const stockItemSchema = Joi.object({
   size: Joi.string()
     .max(50)
-    .optional()
-    .trim(),
+    .required()
+    .trim()
+    .messages({
+      'any.required': 'Size is required for stock item'
+    }),
   color: Joi.string()
     .max(50)
-    .optional()
-    .trim(),
+    .required()
+    .trim()
+    .messages({
+      'any.required': 'Color is required for stock item'
+    }),
   quantity: Joi.number()
     .integer()
     .min(0)
@@ -59,12 +65,15 @@ const colorSchema = Joi.object({
     .max(50)
     .required()
     .trim(),
-  code: Joi.string()
+  hexCode: Joi.string()
     .pattern(/^#[0-9A-F]{6}$/i)
     .optional()
     .messages({
-      'string.pattern.base': 'Color code must be a valid hex color (#RRGGBB)'
-    })
+      'string.pattern.base': 'Color hex code must be a valid hex color (#RRGGBB)'
+    }),
+  images: Joi.array()
+    .items(Joi.string())
+    .optional()
 });
 
 /**
@@ -94,6 +103,21 @@ export const createProductSchema = Joi.object({
     .optional()
     .trim(),
 
+  gender: Joi.string()
+    .valid('Women', 'Men', 'Kids', 'Unisex')
+    .optional()
+    .messages({
+      'any.only': 'Gender must be one of: Women, Men, Kids, Unisex'
+    }),
+
+  material: Joi.string()
+    .max(100)
+    .optional()
+    .trim()
+    .messages({
+      'string.max': 'Material must not exceed 100 characters'
+    }),
+
   brand: Joi.string()
     .max(100)
     .optional()
@@ -116,11 +140,11 @@ export const createProductSchema = Joi.object({
     }),
 
   images: Joi.array()
-    .items(Joi.string().uri())
+    .items(Joi.string().pattern(/^https?:\/\/.+/))
     .optional()
     .messages({
       'array.base': 'Images must be an array',
-      'string.uri': 'Each image must be a valid URL'
+      'string.pattern.base': 'Each image must be a valid URL starting with http:// or https://'
     }),
 
   sizes: Joi.array()
@@ -290,7 +314,7 @@ export const getProductsQuerySchema = Joi.object({
     .trim(),
 
   sort: Joi.string()
-    .valid('price-low', 'price-high', 'rating', 'newest')
+    .valid('price-low', 'price-high', 'rating', 'newest', 'popular', 'price', '-price', 'createdAt', '-createdAt', 'name', '-name')
     .optional()
 });
 

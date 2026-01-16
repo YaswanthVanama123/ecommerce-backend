@@ -8,7 +8,7 @@ import { validatePasswordStrength } from '../utils/sanitize.js';
 // @access  Public
 export const register = async (req, res, next) => {
   try {
-    const { email, password, firstName, lastName, phone } = req.body;
+    const { email, password, firstName, lastName, phone, role } = req.body;
 
     // Validate password strength
     const passwordValidation = validatePasswordStrength(password);
@@ -30,12 +30,13 @@ export const register = async (req, res, next) => {
       password,
       firstName,
       lastName,
-      phone
+      phone,
+      role: role || 'user' // Use provided role or default to 'user'
     });
 
     if (user) {
-      const accessToken = generateAccessToken(user._id);
-      const refreshToken = generateRefreshToken(user._id);
+      const accessToken = generateAccessToken(user._id, user.role);
+      const refreshToken = generateRefreshToken(user._id, user.role);
 
       // Save refresh token to user
       user.refreshToken = refreshToken;
@@ -81,8 +82,8 @@ export const login = async (req, res, next) => {
     }
 
     // Generate tokens
-    const accessToken = generateAccessToken(user._id);
-    const refreshToken = generateRefreshToken(user._id);
+    const accessToken = generateAccessToken(user._id, user.role);
+    const refreshToken = generateRefreshToken(user._id, user.role);
 
     // Save refresh token to user
     user.refreshToken = refreshToken;
@@ -124,7 +125,7 @@ export const refreshToken = async (req, res, next) => {
     }
 
     // Generate new access token
-    const newAccessToken = generateAccessToken(user._id);
+    const newAccessToken = generateAccessToken(user._id, user.role);
 
     sendSuccess(res, 200, {
       accessToken: newAccessToken

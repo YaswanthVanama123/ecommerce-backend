@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
+// import cors from 'cors';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import {
@@ -45,7 +45,9 @@ import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import addressRoutes from './routes/addressRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
+import tempFixRoute from './routes/tempFixRoute.js';
 
 dotenv.config();
 
@@ -94,22 +96,25 @@ app.use(compressionMiddleware);
 
 // 8. Enhanced helmet configuration with strict security headers
 // Sets security headers: CSP, HSTS, X-Frame-Options, etc.
-app.use(helmetConfig);
+// app.use(helmetConfig); // Temporarily disabled for development
 
-// 9. CORS configuration - must be early to handle preflight requests
-const corsOptions = {
-  origin: [
-    process.env.CLIENT_URL,
-    process.env.ADMIN_CLIENT_URL,
-    process.env.SUPERADMIN_CLIENT_URL
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['ETag', 'Last-Modified', 'X-Response-Time', 'Content-Length'],
-  maxAge: 86400, // 24 hours
-};
-app.use(cors(corsOptions));
+// 9. CORS - Disabled for development
+// app.use(cors());
+
+// Manual CORS headers - allow everything
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+  res.header('Access-Control-Allow-Headers', '*');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  // Handle preflight requests
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 // ===== PHASE 2: REQUEST PARSING & SIZE LIMITING =====
 
@@ -197,8 +202,10 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/addresses', addressRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/health', healthRoutes);
+app.use('/api/temp', tempFixRoute); // Temporary route to fix user roles - REMOVE AFTER USE
 
 // ===== PHASE 6: ERROR HANDLING =====
 

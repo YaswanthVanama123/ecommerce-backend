@@ -171,6 +171,27 @@ export const sanitizeRequestBody = (body) => {
       sanitized[key] = value;
     } else if (typeof value === 'boolean') {
       sanitized[key] = value;
+    } else if (Array.isArray(value)) {
+      // IMPORTANT: Check for array BEFORE checking for object
+      // because arrays are also objects in JavaScript
+
+      // Special handling for image/url arrays - don't escape HTML in URLs
+      const isImageOrUrlArray = key.toLowerCase().includes('image') ||
+                                 key.toLowerCase().includes('url') ||
+                                 key.toLowerCase().includes('photo') ||
+                                 key.toLowerCase().includes('picture');
+
+      sanitized[key] = value.map(item => {
+        if (typeof item === 'object' && item !== null) {
+          return sanitizeObject(item);
+        } else if (typeof item === 'string' && isImageOrUrlArray) {
+          // For image/URL arrays, validate as URL without HTML escaping
+          return sanitizeUrl(item) || item.trim();
+        } else if (typeof item === 'string') {
+          return sanitizeString(item);
+        }
+        return item;
+      });
     } else if (typeof value === 'object' && value !== null) {
       sanitized[key] = sanitizeObject(value);
     }

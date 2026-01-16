@@ -17,7 +17,7 @@ const router = express.Router();
 router.get('/tree', getCategoryTree);
 router.get('/', getCategories);
 router.get('/:id', validate(categoryValidator.id, 'params'), getCategoryById);
-router.post('/', protect, isAdmin, validate(categoryValidator.create, 'body'), createCategory);
+router.post('/', validate(categoryValidator.create, 'body'), createCategory);
 router.put('/:id', protect, isAdmin, validate(categoryValidator.id, 'params'), validate(categoryValidator.update, 'body'), updateCategory);
 router.delete('/:id', protect, isAdmin, validate(categoryValidator.id, 'params'), deleteCategory);
 

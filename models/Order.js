@@ -136,7 +136,7 @@ const orderSchema = new mongoose.Schema({
 });
 
 // Generate unique order number before saving
-orderSchema.pre('save', async function(next) {
+orderSchema.pre('save', async function() {
   if (this.isNew) {
     const count = await mongoose.model('Order').countDocuments();
     this.orderNumber = `ORD${Date.now()}${count + 1}`;
@@ -147,7 +147,6 @@ orderSchema.pre('save', async function(next) {
       updatedAt: new Date()
     });
   }
-  next();
 });
 
 // Method to update order status
