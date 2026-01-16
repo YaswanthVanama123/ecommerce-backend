@@ -45,8 +45,14 @@ export const requestPerformanceMonitor = (req, res, next) => {
       console.warn(`[SLOW REQUEST] ${req.method} ${req.path} - ${responseTime}ms`);
     }
 
-    // Add response time header
-    res.set('X-Response-Time', `${responseTime}ms`);
+    // Add response time header if headers haven't been sent yet
+    if (!res.headersSent) {
+      res.set('X-Response-Time', `${responseTime}ms`);
+    } else {
+      console.warn(
+        `[PERF MONITOR] Unable to set X-Response-Time for ${req.method} ${req.originalUrl} after headers were sent`
+      );
+    }
 
     // Call the original end function
     return originalEnd.apply(res, args);

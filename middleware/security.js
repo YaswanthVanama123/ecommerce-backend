@@ -1,7 +1,7 @@
 import express from 'express';
 import helmet from 'helmet';
 import mongoSanitize from 'express-mongo-sanitize';
-import xss from 'xss-clean';
+import * as xssFilters from 'xss-filters';
 import hpp from 'hpp';
 import rateLimit from 'express-rate-limit';
 
@@ -29,10 +29,60 @@ export const helmetConfig = helmet({
 });
 
 // MongoDB data sanitization middleware - removes $ and . from keys
-export const mongoSanitizeMiddleware = mongoSanitize();
+const { sanitize: sanitizeMongoObject } = mongoSanitize;
+
+const sanitizeRequestObject = (target) => {
+  if (target && typeof target === 'object') {
+    sanitizeMongoObject(target);
+  }
+};
+
+export const mongoSanitizeMiddleware = (req, res, next) => {
+  sanitizeRequestObject(req.body);
+  sanitizeRequestObject(req.params);
+  sanitizeRequestObject(req.headers);
+  sanitizeRequestObject(req.query);
+  next();
+};
+
+const sanitizeObjectInPlace = (obj) => {
+  if (Array.isArray(obj)) {
+    obj.forEach((item, index) => {
+      obj[index] = sanitizeValue(item);
+    });
+    return;
+  }
+
+  Object.keys(obj).forEach((key) => {
+    obj[key] = sanitizeValue(obj[key]);
+  });
+};
+
+const sanitizeValue = (value) => {
+  if (typeof value === 'string') {
+    return xssFilters.inHTMLData(value).trim();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => sanitizeValue(item));
+  }
+
+  if (value && typeof value === 'object') {
+    sanitizeObjectInPlace(value);
+    return value;
+  }
+
+  return value;
+};
 
 // Data sanitization against XSS
-export const xssMiddleware = xss();
+export const xssMiddleware = (req, res, next) => {
+  if (req.body) sanitizeObjectInPlace(req.body);
+  if (req.query) sanitizeObjectInPlace(req.query);
+  if (req.params) sanitizeObjectInPlace(req.params);
+  if (req.headers) sanitizeObjectInPlace(req.headers);
+  next();
+};
 
 // Prevent HTTP Parameter Pollution attacks
 export const hppMiddleware = hpp({

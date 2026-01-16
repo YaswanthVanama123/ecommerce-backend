@@ -1,4 +1,5 @@
 export const errorHandler = (err, req, res, next) => {
+  console.error('[ERROR HANDLER] ', err);
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   res.status(statusCode);
 
