@@ -1,4 +1,5 @@
 import Category from '../models/Category.js';
+import Product from '../models/Product.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
 import cacheManager, { TTL, CACHE_KEYS } from '../utils/cache.js';
 
@@ -21,10 +22,24 @@ export const getCategories = async (req, res, next) => {
       .sort({ order: 1, name: 1 })
       .lean();
 
-    // Cache for 1 hour
-    cacheManager.set(cacheKey, categories, TTL.ONE_HOUR);
+    // Get product counts for each category
+    const categoriesWithCounts = await Promise.all(
+      categories.map(async (category) => {
+        const productCount = await Product.countDocuments({
+          category: category._id,
+          isActive: true
+        });
+        return {
+          ...category,
+          productCount
+        };
+      })
+    );
 
-    sendSuccess(res, 200, categories, 'Categories fetched successfully');
+    // Cache for 1 hour
+    cacheManager.set(cacheKey, categoriesWithCounts, TTL.ONE_HOUR);
+
+    sendSuccess(res, 200, categoriesWithCounts, 'Categories fetched successfully');
   } catch (error) {
     next(error);
   }
@@ -52,10 +67,21 @@ export const getCategoryById = async (req, res, next) => {
       return sendError(res, 404, 'Category not found');
     }
 
-    // Cache for 1 hour
-    cacheManager.set(cacheKey, category, TTL.ONE_HOUR);
+    // Get product count for this category
+    const productCount = await Product.countDocuments({
+      category: category._id,
+      isActive: true
+    });
 
-    sendSuccess(res, 200, category, 'Category fetched successfully');
+    const categoryWithCount = {
+      ...category,
+      productCount
+    };
+
+    // Cache for 1 hour
+    cacheManager.set(cacheKey, categoryWithCount, TTL.ONE_HOUR);
+
+    sendSuccess(res, 200, categoryWithCount, 'Category fetched successfully');
   } catch (error) {
     next(error);
   }

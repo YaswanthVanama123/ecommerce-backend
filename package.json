@@ -8,6 +8,8 @@
     "start": "nodemon server.js",
     "dev": "nodemon server.js",
     "seed": "node scripts/seed.js",
+    "seed:superadmin": "node scripts/createSuperAdmin.js",
+    "seed:pincodes": "node scripts/seedPincodes.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",

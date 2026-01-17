@@ -52,6 +52,9 @@ import healthRoutes from './routes/healthRoutes.js';
 import tempFixRoute from './routes/tempFixRoute.js';
 import reviewRoutes from './routes/reviewRoutes.js';
 import bannerRoutes from './routes/bannerRoutes.js';
+import superadminRoutes from './routes/superadminRoutes.js';
+import pincodeRoutes from './routes/pincodeRoutes.js';
+import publicPincodeRoutes from './routes/publicPincodeRoutes.js';
 
 dotenv.config();
 
@@ -212,6 +215,9 @@ app.use('/api/addresses', addressRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/banners', bannerRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/superadmin', superadminRoutes);
+app.use('/api/superadmin/pincodes', pincodeRoutes);
+app.use('/api/pincode', publicPincodeRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/temp', tempFixRoute); // Temporary route to fix user roles - REMOVE AFTER USE
 
@@ -276,6 +282,7 @@ const server = app.listen(PORT, () => {
   console.log(`   - Reviews: http://localhost:${PORT}/api/reviews`);
   console.log(`   - Banners: http://localhost:${PORT}/api/banners`);
   console.log(`   - Admin: http://localhost:${PORT}/api/admin`);
+  console.log(`   - SuperAdmin: http://localhost:${PORT}/api/superadmin`);
   console.log();
   console.log(`📊 Monitoring Endpoints:`);
   console.log(`   - Health Status: http://localhost:${PORT}/api/health/status`);
