@@ -112,11 +112,44 @@ export const logoutSchema = Joi.object({}).unknown(true).optional();
  */
 export const getMeSchema = Joi.object({}).unknown(true).optional();
 
+/**
+ * Change password validation schema
+ */
+export const changePasswordSchema = Joi.object({
+  currentPassword: Joi.string()
+    .required()
+    .messages({
+      'any.required': 'Current password is required',
+      'string.empty': 'Current password cannot be empty'
+    }),
+
+  newPassword: Joi.string()
+    .min(8)
+    .max(50)
+    .pattern(passwordPattern)
+    .required()
+    .messages({
+      'string.pattern.base': 'New password must contain at least 1 uppercase letter, 1 lowercase letter, 1 number, and 1 special character (@$!%*?&)',
+      'string.min': 'New password must be at least 8 characters',
+      'string.max': 'New password must not exceed 50 characters',
+      'any.required': 'New password is required'
+    }),
+
+  confirmPassword: Joi.string()
+    .valid(Joi.ref('newPassword'))
+    .required()
+    .messages({
+      'any.only': 'Passwords do not match',
+      'any.required': 'Password confirmation is required'
+    })
+});
+
 // Export all validators as a single object for convenience
 export default {
   register: registerSchema,
   login: loginSchema,
   refresh: refreshTokenSchema,
   logout: logoutSchema,
-  getMe: getMeSchema
+  getMe: getMeSchema,
+  changePassword: changePasswordSchema
 };

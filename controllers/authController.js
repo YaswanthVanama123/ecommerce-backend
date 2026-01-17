@@ -160,3 +160,52 @@ export const getMe = async (req, res, next) => {
     next(error);
   }
 };
+
+// @desc    Change user password
+// @route   PUT /api/auth/change-password
+// @access  Private
+export const changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+
+    // Get user with password field
+    const user = await User.findById(req.user._id).select('+password');
+
+    if (!user) {
+      return sendError(res, 404, 'User not found');
+    }
+
+    // Verify current password
+    const isMatch = await user.matchPassword(currentPassword);
+
+    if (!isMatch) {
+      return sendError(res, 401, 'Current password is incorrect');
+    }
+
+    // Validate new password strength
+    const passwordValidation = validatePasswordStrength(newPassword);
+    if (!passwordValidation.isValid) {
+      return sendError(res, 400, 'New password does not meet security requirements', {
+        errors: passwordValidation.errors
+      });
+    }
+
+    // Check if new password is same as current password
+    const isSamePassword = await user.matchPassword(newPassword);
+    if (isSamePassword) {
+      return sendError(res, 400, 'New password must be different from current password');
+    }
+
+    // Update password
+    user.password = newPassword;
+    await user.save();
+
+    // Clear all refresh tokens for security
+    user.refreshToken = undefined;
+    await user.save();
+
+    sendSuccess(res, 200, null, 'Password changed successfully. Please login again.');
+  } catch (error) {
+    next(error);
+  }
+};
