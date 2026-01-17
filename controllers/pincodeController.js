@@ -174,13 +174,13 @@ export const getAllPincodes = async (req, res) => {
       ];
     }
 
-    // Filter by serviceability
-    if (isServiceable !== undefined) {
+    // Filter by serviceability (only if explicitly set to 'true' or 'false')
+    if (isServiceable !== undefined && isServiceable !== '') {
       query.isServiceable = isServiceable === 'true';
     }
 
-    // Filter by delivery zone
-    if (deliveryZone) {
+    // Filter by delivery zone (only if not empty)
+    if (deliveryZone && deliveryZone !== '') {
       query.deliveryZone = deliveryZone;
     }
 
@@ -193,7 +193,8 @@ export const getAllPincodes = async (req, res) => {
       .sort({ pincode: 1 })
       .limit(limit * 1)
       .skip((page - 1) * limit)
-      .populate('restrictedCategories', 'name');
+      .populate('restrictedCategories', 'name')
+      .lean({ virtuals: true }); // Convert to plain objects and include virtuals
 
     const count = await Pincode.countDocuments(query);
 
@@ -354,14 +355,27 @@ export const deletePincode = async (req, res) => {
  */
 export const bulkUploadPincodes = async (req, res) => {
   try {
-    const { pincodes } = req.body;
-
-    if (!Array.isArray(pincodes) || pincodes.length === 0) {
+    // Check if file was uploaded
+    if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide an array of pincodes',
+        message: 'Please upload a CSV file',
       });
     }
+
+    // Parse CSV file content
+    const fileContent = req.file.buffer.toString('utf-8');
+    const lines = fileContent.split('\n').filter(line => line.trim());
+
+    if (lines.length < 2) {
+      return res.status(400).json({
+        success: false,
+        message: 'CSV file is empty or invalid',
+      });
+    }
+
+    // Skip header row and parse data rows
+    const dataRows = lines.slice(1);
 
     const results = {
       success: [],
@@ -369,26 +383,50 @@ export const bulkUploadPincodes = async (req, res) => {
       duplicate: [],
     };
 
-    for (const pincodeData of pincodes) {
+    for (const row of dataRows) {
       try {
+        const [pincode, city, district, state, deliveryZone, deliveryDays, isServiceable, codAvailable] = row.split(',').map(val => val.trim());
+
+        if (!pincode || !city || !district || !state) {
+          results.failed.push({
+            pincode: pincode || 'unknown',
+            reason: 'Missing required fields (pincode, city, district, state)',
+          });
+          continue;
+        }
+
         // Check if pincode already exists
-        const existing = await Pincode.findOne({
-          pincode: pincodeData.pincode,
-        });
+        const existing = await Pincode.findOne({ pincode });
 
         if (existing) {
           results.duplicate.push({
-            pincode: pincodeData.pincode,
+            pincode,
             reason: 'Already exists',
           });
           continue;
         }
 
+        // Create pincode with proper data mapping
+        const pincodeData = {
+          pincode,
+          city,
+          district,
+          state,
+          deliveryZone: deliveryZone || 'urban',
+          estimatedDeliveryDays: {
+            min: parseInt(deliveryDays) || 2,
+            max: (parseInt(deliveryDays) || 2) + 2,
+          },
+          isServiceable: isServiceable === 'true',
+          codAvailable: codAvailable === 'true',
+        };
+
         await Pincode.create(pincodeData);
-        results.success.push(pincodeData.pincode);
+        results.success.push(pincode);
       } catch (error) {
+        const pincodeValue = row.split(',')[0]?.trim() || 'unknown';
         results.failed.push({
-          pincode: pincodeData.pincode,
+          pincode: pincodeValue,
           reason: error.message,
         });
       }
@@ -398,7 +436,7 @@ export const bulkUploadPincodes = async (req, res) => {
       success: true,
       message: 'Bulk upload completed',
       data: {
-        total: pincodes.length,
+        total: dataRows.length,
         successful: results.success.length,
         failed: results.failed.length,
         duplicate: results.duplicate.length,
@@ -456,6 +494,71 @@ export const getPincodeStats = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Error fetching pincode stats',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Download CSV template for bulk pincode upload
+ * @route   GET /api/superadmin/pincodes/download-template
+ * @access  Private/Superadmin
+ */
+export const downloadPincodeTemplate = async (req, res) => {
+  try {
+    const csvHeaders = [
+      'pincode',
+      'city',
+      'district',
+      'state',
+      'deliveryZone',
+      'deliveryDays',
+      'isServiceable',
+      'codAvailable',
+    ];
+
+    // Fetch all pincodes from database
+    const pincodes = await Pincode.find({})
+      .select('pincode city district state deliveryZone estimatedDeliveryDays isServiceable codAvailable')
+      .lean();
+
+    // Convert pincodes to CSV rows
+    const csvRows = pincodes.map(pincode => {
+      const deliveryDays = pincode.estimatedDeliveryDays?.min || 2;
+      return [
+        pincode.pincode,
+        pincode.city,
+        pincode.district,
+        pincode.state,
+        pincode.deliveryZone,
+        deliveryDays,
+        pincode.isServiceable,
+        pincode.codAvailable
+      ].join(',');
+    });
+
+    // If no pincodes exist, add sample data
+    if (csvRows.length === 0) {
+      csvRows.push(
+        '560001,Bangalore,Bangalore Urban,Karnataka,metro,2,true,true',
+        '110001,Delhi,Central Delhi,Delhi,metro,1,true,true',
+        '400001,Mumbai,Mumbai City,Maharashtra,metro,2,true,true',
+        '600001,Chennai,Chennai,Tamil Nadu,urban,3,true,true',
+        '700001,Kolkata,Kolkata,West Bengal,urban,3,true,false'
+      );
+    }
+
+    const csvContent = [csvHeaders.join(','), ...csvRows].join('\n');
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', 'attachment; filename=pincode_export.csv');
+
+    return res.status(200).send(csvContent);
+  } catch (error) {
+    console.error('Error generating template:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Error generating template',
       error: error.message,
     });
   }
