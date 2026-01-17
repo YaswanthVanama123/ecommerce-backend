@@ -4,6 +4,12 @@ import Cart from '../models/Cart.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
+import {
+  sendOrderConfirmationEmail,
+  sendOrderStatusEmail,
+  sendOrderCancellationEmail,
+  sendOrderShippedEmail
+} from '../utils/emailService.js';
 
 // @desc    Create new order from cart with transaction
 // @route   POST /api/orders
@@ -156,6 +162,19 @@ export const createOrder = async (req, res, next) => {
 
     await session.commitTransaction();
 
+    // Send order confirmation email (non-blocking)
+    try {
+      await sendOrderConfirmationEmail(req.user.email, {
+        orderNumber: order[0].orderNumber,
+        totalAmount: order[0].totalAmount,
+        items: order[0].items,
+        shippingAddress: order[0].shippingAddress
+      });
+    } catch (emailError) {
+      console.error('Failed to send order confirmation email:', emailError);
+      // Don't fail the request if email fails
+    }
+
     sendSuccess(res, 201, order[0], 'Order created successfully');
   } catch (error) {
     await session.abortTransaction();
@@ -286,6 +305,18 @@ export const cancelOrder = async (req, res, next) => {
 
     await session.commitTransaction();
 
+    // Send order cancellation email (non-blocking)
+    try {
+      await sendOrderCancellationEmail(req.user.email, {
+        orderNumber: order.orderNumber,
+        reason: reason,
+        refundAmount: order.paymentStatus === 'completed' ? order.totalAmount : null
+      });
+    } catch (emailError) {
+      console.error('Failed to send order cancellation email:', emailError);
+      // Don't fail the request if email fails
+    }
+
     sendSuccess(res, 200, order, 'Order cancelled successfully');
   } catch (error) {
     await session.abortTransaction();
@@ -343,7 +374,7 @@ export const getAllOrders = async (req, res, next) => {
 // @access  Private/Admin
 export const updateOrderStatus = async (req, res, next) => {
   try {
-    const { status, note } = req.body;
+    const { status, note, trackingNumber, carrier } = req.body;
 
     const validStatuses = ['pending', 'confirmed', 'processing', 'shipped', 'delivered', 'cancelled'];
     if (!validStatuses.includes(status)) {
@@ -351,7 +382,8 @@ export const updateOrderStatus = async (req, res, next) => {
     }
 
     // Use findById which uses the _id index
-    const order = await Order.findById(req.params.id);
+    const order = await Order.findById(req.params.id)
+      .populate('user', 'email firstName lastName');
 
     if (!order) {
       return sendError(res, 404, 'Order not found');
@@ -366,6 +398,33 @@ export const updateOrderStatus = async (req, res, next) => {
     }
 
     await order.save();
+
+    // Send appropriate email notification (non-blocking)
+    try {
+      if (status === 'shipped') {
+        await sendOrderShippedEmail(order.user.email, {
+          orderNumber: order.orderNumber,
+          trackingNumber: trackingNumber || 'Not available',
+          carrier: carrier || 'Standard Shipping',
+          estimatedDelivery: '3-5 business days'
+        });
+      } else if (status === 'cancelled') {
+        await sendOrderCancellationEmail(order.user.email, {
+          orderNumber: order.orderNumber,
+          reason: note || 'Cancelled by admin'
+        });
+      } else {
+        await sendOrderStatusEmail(order.user.email, {
+          orderNumber: order.orderNumber,
+          status: status,
+          note: note,
+          trackingNumber: trackingNumber
+        });
+      }
+    } catch (emailError) {
+      console.error('Failed to send status update email:', emailError);
+      // Don't fail the request if email fails
+    }
 
     sendSuccess(res, 200, order, 'Order status updated successfully');
   } catch (error) {

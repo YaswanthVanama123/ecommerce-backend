@@ -56,6 +56,20 @@ export const updateOrderStatusSchema = Joi.object({
     .messages({
       'string.min': 'Note must be at least 3 characters',
       'string.max': 'Note must not exceed 500 characters'
+    }),
+
+  trackingNumber: Joi.string()
+    .optional()
+    .trim()
+    .messages({
+      'string.base': 'Tracking number must be a string'
+    }),
+
+  carrier: Joi.string()
+    .optional()
+    .trim()
+    .messages({
+      'string.base': 'Carrier must be a string'
     })
 });
 

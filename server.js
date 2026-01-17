@@ -43,11 +43,15 @@ import authRoutes from './routes/authRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
+import wishlistRoutes from './routes/wishlistRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import paymentRoutes from './routes/paymentRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import addressRoutes from './routes/addressRoutes.js';
 import healthRoutes from './routes/healthRoutes.js';
 import tempFixRoute from './routes/tempFixRoute.js';
+import reviewRoutes from './routes/reviewRoutes.js';
+import bannerRoutes from './routes/bannerRoutes.js';
 
 dotenv.config();
 
@@ -201,8 +205,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/payment', paymentRoutes);
 app.use('/api/addresses', addressRoutes);
+app.use('/api/reviews', reviewRoutes);
+app.use('/api/banners', bannerRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/temp', tempFixRoute); // Temporary route to fix user roles - REMOVE AFTER USE
@@ -263,7 +271,10 @@ const server = app.listen(PORT, () => {
   console.log(`   - Products: http://localhost:${PORT}/api/products`);
   console.log(`   - Categories: http://localhost:${PORT}/api/categories`);
   console.log(`   - Cart: http://localhost:${PORT}/api/cart`);
+  console.log(`   - Wishlist: http://localhost:${PORT}/api/wishlist`);
   console.log(`   - Orders: http://localhost:${PORT}/api/orders`);
+  console.log(`   - Reviews: http://localhost:${PORT}/api/reviews`);
+  console.log(`   - Banners: http://localhost:${PORT}/api/banners`);
   console.log(`   - Admin: http://localhost:${PORT}/api/admin`);
   console.log();
   console.log(`📊 Monitoring Endpoints:`);

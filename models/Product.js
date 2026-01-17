@@ -1,24 +1,8 @@
 import mongoose from 'mongoose';
 
-const reviewSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
-  rating: {
-    type: Number,
-    required: true,
-    min: 1,
-    max: 5
-  },
-  comment: {
-    type: String,
-    required: true
-  }
-}, {
-  timestamps: true
-});
+// NOTE: The old embedded review schema has been deprecated.
+// Reviews are now stored in a separate Review collection for better scalability.
+// See models/Review.js for the new review schema.
 
 const colorSchema = new mongoose.Schema({
   name: {
@@ -118,7 +102,13 @@ const productSchema = new mongoose.Schema({
       default: 0
     }
   },
-  reviews: [reviewSchema],
+  // NOTE: reviews field has been deprecated. Use the separate Review model instead.
+  // This field is kept for backward compatibility but should not be used.
+  reviews: {
+    type: [mongoose.Schema.Types.Mixed],
+    default: [],
+    select: false // Don't include in queries by default
+  },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',

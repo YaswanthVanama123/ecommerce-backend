@@ -300,6 +300,13 @@ export const getProductsQuerySchema = Joi.object({
     .optional()
     .trim(),
 
+  gender: Joi.string()
+    .valid('Women', 'Men', 'Kids', 'Unisex')
+    .optional()
+    .messages({
+      'any.only': 'Gender must be one of: Women, Men, Kids, Unisex'
+    }),
+
   size: Joi.string()
     .optional()
     .trim(),

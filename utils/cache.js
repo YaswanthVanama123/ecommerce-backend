@@ -297,7 +297,11 @@ export const CACHE_KEYS = {
   CATEGORY_TREE: 'category_tree',
   PRODUCTS: 'products',
   PRODUCT: 'product',
-  FEATURED_PRODUCTS: 'featured_products'
+  FEATURED_PRODUCTS: 'featured_products',
+  TRENDING_PRODUCTS: 'trending_products',
+  ACTIVE_BANNERS: 'active_banners',
+  BANNER: 'banner',
+  ALL_BANNERS: 'all_banners'
 };
 
 // Export cache manager instance

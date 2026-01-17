@@ -14,11 +14,14 @@ import cartValidator from '../validators/cartValidator.js';
 
 const router = express.Router();
 
+// Main cart routes
 router.get('/', protect, getCart);
-router.post('/items', protect, validate(cartValidator.addToCart, 'body'), addToCart);
-router.put('/items/:itemId', protect, validate(cartValidator.itemId, 'params'), validate(cartValidator.updateItem, 'body'), updateCartItem);
-router.delete('/items/:itemId', protect, validate(cartValidator.itemId, 'params'), removeFromCart);
+router.post('/', protect, validate(cartValidator.addToCart, 'body'), addToCart);
 router.delete('/', protect, clearCart);
+
+// Cart item routes
+router.put('/:itemId', protect, validate(cartValidator.itemId, 'params'), validate(cartValidator.updateItem, 'body'), updateCartItem);
+router.delete('/:itemId', protect, validate(cartValidator.itemId, 'params'), removeFromCart);
 
 // Bulk operations
 router.put('/items/bulk', protect, bulkUpdateCartItems);

@@ -194,6 +194,45 @@ export const getFeaturedProducts = async (req, res, next) => {
   }
 };
 
+// @desc    Get trending products (based on ratings count and average)
+// @route   GET /api/products/trending
+// @access  Public
+export const getTrendingProducts = async (req, res, next) => {
+  const startTime = Date.now();
+
+  try {
+    const limit = Math.min(parseInt(req.query.limit) || 10, 50); // Cap at 50
+    const cacheKey = `${CACHE_KEYS.TRENDING_PRODUCTS}:${limit}`;
+
+    // Try to get from cache
+    const cachedProducts = cacheManager.get(cacheKey);
+    if (cachedProducts) {
+      logQueryPerformance('getTrendingProducts (cached)', startTime, cachedProducts.length);
+      return sendSuccess(res, 200, cachedProducts, 'Trending products fetched successfully (cached)');
+    }
+
+    // Cache miss - fetch from database
+    // Trending products are determined by high ratings count (popularity) and good average rating
+    const products = await Product.find({ isActive: true })
+      .select('name slug description price discountPrice images category brand ratings')
+      .populate('category', 'name slug')
+      .sort({ 'ratings.count': -1, 'ratings.average': -1, createdAt: -1 })
+      .limit(limit)
+      .lean()
+      .exec();
+
+    // Cache for 30 minutes
+    cacheManager.set(cacheKey, products, TTL.THIRTY_MINUTES);
+
+    logQueryPerformance('getTrendingProducts', startTime, products.length);
+
+    sendSuccess(res, 200, products, 'Trending products fetched successfully');
+  } catch (error) {
+    logQueryPerformance('getTrendingProducts (error)', startTime);
+    next(error);
+  }
+};
+
 // @desc    Get product by ID
 // @route   GET /api/products/:id
 // @access  Public
@@ -812,6 +851,43 @@ export const getProductReviews = async (req, res, next) => {
   }
 };
 
+// @desc    Get product review statistics
+// @route   GET /api/products/:id/reviews/stats
+// @access  Public
+export const getReviewStats = async (req, res, next) => {
+  const startTime = Date.now();
+
+  try {
+    const product = await Product.findById(req.params.id)
+      .select('ratings reviews')
+      .lean()
+      .exec();
+
+    if (!product) {
+      return sendError(res, 404, 'Product not found');
+    }
+
+    // Calculate rating distribution
+    const ratingDistribution = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    product.reviews.forEach(review => {
+      if (review.rating >= 1 && review.rating <= 5) {
+        ratingDistribution[review.rating]++;
+      }
+    });
+
+    logQueryPerformance('getReviewStats', startTime);
+
+    sendSuccess(res, 200, {
+      ratings: product.ratings,
+      totalReviews: product.reviews.length,
+      ratingDistribution
+    }, 'Review stats fetched successfully');
+  } catch (error) {
+    logQueryPerformance('getReviewStats (error)', startTime);
+    next(error);
+  }
+};
+
 // @desc    Get products aggregated statistics (for admin dashboard)
 // @route   GET /api/products/stats
 // @access  Private/Admin
@@ -881,5 +957,25 @@ export const getProductStats = async (req, res, next) => {
   } catch (error) {
     logQueryPerformance('getProductStats (error)', startTime);
     next(error);
+  }
+};
+
+// @desc    Get all categories (convenience endpoint)
+// @route   GET /api/products/categories
+// @access  Public
+export const getProductCategories = async (req, res, next) => {
+  try {
+    const categories = await Category.find({ isActive: true })
+      .select('_id name slug description')
+      .sort({ name: 1 })
+      .lean();
+
+    return sendSuccess(res, 200, {
+      categories,
+      count: categories.length
+    });
+  } catch (error) {
+    console.error('Error fetching product categories:', error);
+    return sendError(res, 500, 'Failed to fetch categories');
   }
 };

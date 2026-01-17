@@ -17,13 +17,13 @@ import orderValidator from '../validators/orderValidator.js';
 
 const router = express.Router();
 
-// User routes
+// User routes - Order Management
 router.post('/', protect, validate(orderValidator.create, 'body'), createOrder);
 router.get('/', protect, validate(orderValidator.getOrders, 'query'), getMyOrders);
 router.get('/:id', protect, validate(orderValidator.id, 'params'), getOrderById);
-router.put('/:id/cancel', protect, validate(orderValidator.id, 'params'), validate(orderValidator.cancel, 'body'), cancelOrder);
+router.post('/:id/cancel', protect, validate(orderValidator.id, 'params'), validate(orderValidator.cancel, 'body'), cancelOrder);
 
-// Admin routes
+// Admin routes - Order Management
 router.get('/admin/orders', protect, isAdmin, validate(orderValidator.getAllOrders, 'query'), getAllOrders);
 router.put('/admin/orders/:id/status', protect, isAdmin, validate(orderValidator.id, 'params'), validate(orderValidator.updateStatus, 'body'), updateOrderStatus);
 
