@@ -9,6 +9,21 @@ const objectIdPattern = /^[0-9a-fA-F]{24}$/;
  * Create review validation schema
  */
 export const createReviewSchema = Joi.object({
+  productId: Joi.string()
+    .regex(objectIdPattern)
+    .required()
+    .messages({
+      'string.pattern.base': 'Invalid product ID format',
+      'any.required': 'Product ID is required'
+    }),
+
+  orderId: Joi.string()
+    .regex(objectIdPattern)
+    .optional()
+    .messages({
+      'string.pattern.base': 'Invalid order ID format'
+    }),
+
   rating: Joi.number()
     .integer()
     .min(1)
@@ -35,15 +50,42 @@ export const createReviewSchema = Joi.object({
     }),
 
   comment: Joi.string()
-    .min(10)
     .max(2000)
-    .required()
+    .optional()
     .trim()
     .messages({
-      'string.empty': 'Review comment is required',
-      'string.min': 'Comment must be at least 10 characters',
-      'string.max': 'Comment must not exceed 2000 characters',
-      'any.required': 'Review comment is required'
+      'string.max': 'Comment must not exceed 2000 characters'
+    }),
+
+  qualityRating: Joi.number()
+    .integer()
+    .min(1)
+    .max(5)
+    .optional()
+    .messages({
+      'number.base': 'Quality rating must be a number',
+      'number.integer': 'Quality rating must be a whole number',
+      'number.min': 'Quality rating must be at least 1',
+      'number.max': 'Quality rating must not exceed 5'
+    }),
+
+  valueRating: Joi.number()
+    .integer()
+    .min(1)
+    .max(5)
+    .optional()
+    .messages({
+      'number.base': 'Value rating must be a number',
+      'number.integer': 'Value rating must be a whole number',
+      'number.min': 'Value rating must be at least 1',
+      'number.max': 'Value rating must not exceed 5'
+    }),
+
+  sizeRating: Joi.string()
+    .valid('too_small', 'perfect_fit', 'too_large')
+    .optional()
+    .messages({
+      'any.only': 'Size rating must be one of: too_small, perfect_fit, too_large'
     })
 });
 
@@ -74,13 +116,42 @@ export const updateReviewSchema = Joi.object({
     }),
 
   comment: Joi.string()
-    .min(10)
     .max(2000)
     .optional()
     .trim()
     .messages({
-      'string.min': 'Comment must be at least 10 characters',
       'string.max': 'Comment must not exceed 2000 characters'
+    }),
+
+  qualityRating: Joi.number()
+    .integer()
+    .min(1)
+    .max(5)
+    .optional()
+    .messages({
+      'number.base': 'Quality rating must be a number',
+      'number.integer': 'Quality rating must be a whole number',
+      'number.min': 'Quality rating must be at least 1',
+      'number.max': 'Quality rating must not exceed 5'
+    }),
+
+  valueRating: Joi.number()
+    .integer()
+    .min(1)
+    .max(5)
+    .optional()
+    .messages({
+      'number.base': 'Value rating must be a number',
+      'number.integer': 'Value rating must be a whole number',
+      'number.min': 'Value rating must be at least 1',
+      'number.max': 'Value rating must not exceed 5'
+    }),
+
+  sizeRating: Joi.string()
+    .valid('too_small', 'perfect_fit', 'too_large')
+    .optional()
+    .messages({
+      'any.only': 'Size rating must be one of: too_small, perfect_fit, too_large'
     })
 }).min(1).messages({
   'object.min': 'At least one field must be provided for update'
@@ -113,6 +184,26 @@ export const reviewIdSchema = Joi.object({
 });
 
 /**
+ * Review eligibility params validation
+ */
+export const reviewEligibilitySchema = Joi.object({
+  orderId: Joi.string()
+    .regex(objectIdPattern)
+    .required()
+    .messages({
+      'string.pattern.base': 'Invalid order ID format',
+      'any.required': 'Order ID is required'
+    }),
+  productId: Joi.string()
+    .regex(objectIdPattern)
+    .required()
+    .messages({
+      'string.pattern.base': 'Invalid product ID format',
+      'any.required': 'Product ID is required'
+    })
+});
+
+/**
  * Get reviews query validation schema
  */
 export const getReviewsQuerySchema = Joi.object({
@@ -138,10 +229,11 @@ export const getReviewsQuerySchema = Joi.object({
       'number.max': 'Limit cannot exceed 50'
     }),
 
-  rating: Joi.number()
-    .integer()
-    .min(1)
-    .max(5)
+  rating: Joi.alternatives()
+    .try(
+      Joi.number().integer().min(1).max(5),
+      Joi.string().valid('').allow('')
+    )
     .optional()
     .messages({
       'number.base': 'Rating filter must be a number',
@@ -155,6 +247,26 @@ export const getReviewsQuerySchema = Joi.object({
       'boolean.base': 'Verified must be a boolean value'
     }),
 
+  hasImages: Joi.boolean()
+    .optional()
+    .messages({
+      'boolean.base': 'HasImages must be a boolean value'
+    }),
+
+  status: Joi.string()
+    .valid('pending', 'approved', 'rejected')
+    .optional()
+    .messages({
+      'any.only': 'Status must be one of: pending, approved, rejected'
+    }),
+
+  search: Joi.string()
+    .optional()
+    .allow('')
+    .messages({
+      'string.base': 'Search must be a string'
+    }),
+
   sort: Joi.string()
     .valid('newest', 'oldest', 'highest', 'lowest', 'helpful')
     .default('newest')
@@ -164,11 +276,119 @@ export const getReviewsQuerySchema = Joi.object({
     })
 });
 
+/**
+ * Vote review validation
+ */
+export const voteReviewSchema = Joi.object({
+  type: Joi.string()
+    .valid('helpful', 'notHelpful')
+    .required()
+    .messages({
+      'any.only': 'Vote type must be either "helpful" or "notHelpful"',
+      'any.required': 'Vote type is required'
+    })
+});
+
+/**
+ * Report review validation
+ */
+export const reportReviewSchema = Joi.object({
+  reason: Joi.string()
+    .valid('spam', 'offensive', 'misleading', 'other')
+    .required()
+    .messages({
+      'any.only': 'Reason must be one of: spam, offensive, misleading, other',
+      'any.required': 'Report reason is required'
+    }),
+
+  description: Joi.string()
+    .max(500)
+    .optional()
+    .trim()
+    .messages({
+      'string.max': 'Description must not exceed 500 characters'
+    })
+});
+
+/**
+ * Admin reject review validation
+ */
+export const rejectReviewSchema = Joi.object({
+  reason: Joi.string()
+    .min(10)
+    .max(500)
+    .required()
+    .trim()
+    .messages({
+      'string.empty': 'Rejection reason is required',
+      'string.min': 'Reason must be at least 10 characters',
+      'string.max': 'Reason must not exceed 500 characters',
+      'any.required': 'Rejection reason is required'
+    })
+});
+
+/**
+ * Admin respond to review validation
+ */
+export const respondReviewSchema = Joi.object({
+  response: Joi.string()
+    .min(10)
+    .max(1000)
+    .required()
+    .trim()
+    .messages({
+      'string.empty': 'Response is required',
+      'string.min': 'Response must be at least 10 characters',
+      'string.max': 'Response must not exceed 1000 characters',
+      'any.required': 'Response is required'
+    })
+});
+
+/**
+ * Handle report validation
+ */
+export const handleReportSchema = Joi.object({
+  action: Joi.string()
+    .valid('resolved', 'dismissed')
+    .required()
+    .messages({
+      'any.only': 'Action must be either "resolved" or "dismissed"',
+      'any.required': 'Action is required'
+    })
+});
+
+/**
+ * Report ID params validation
+ */
+export const reportIdSchema = Joi.object({
+  id: Joi.string()
+    .regex(objectIdPattern)
+    .required()
+    .messages({
+      'string.pattern.base': 'Invalid review ID format',
+      'any.required': 'Review ID is required'
+    }),
+  reportId: Joi.string()
+    .regex(objectIdPattern)
+    .required()
+    .messages({
+      'string.pattern.base': 'Invalid report ID format',
+      'any.required': 'Report ID is required'
+    })
+});
+
 // Export all validators as a single object for convenience
 export default {
   create: createReviewSchema,
   update: updateReviewSchema,
   productId: productIdSchema,
   reviewId: reviewIdSchema,
-  getReviews: getReviewsQuerySchema
+  reviewEligibility: reviewEligibilitySchema,
+  getReviews: getReviewsQuerySchema,
+  vote: voteReviewSchema,
+  report: reportReviewSchema,
+  reject: rejectReviewSchema,
+  respond: respondReviewSchema,
+  handleReport: handleReportSchema,
+  reportId: reportIdSchema
 };

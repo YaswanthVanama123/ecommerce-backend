@@ -82,19 +82,6 @@ const productSchema = new mongoose.Schema({
   colors: [colorSchema],
   stock: [stockSchema],
   tags: [String],
-  // HSN Code for GST compliance
-  hsnCode: {
-    type: String,
-    default: null,
-    trim: true,
-    validate: {
-      validator: function(v) {
-        if (!v) return true;
-        return /^[0-9]{4,8}$/.test(v);
-      },
-      message: "HSN code must be 4 to 8 digits"
-    }
-  },
   isFeatured: {
     type: Boolean,
     default: false

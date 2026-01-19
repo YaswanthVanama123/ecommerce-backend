@@ -417,3 +417,114 @@ export const testEmailConfiguration = async () => {
     return { success: false, message: error.message };
   }
 };
+
+/**
+ * Send order modification email
+ * @param {string} email - Customer email
+ * @param {object} modificationData - Modification details
+ */
+export const sendOrderModificationEmail = async (email, modificationData) => {
+  try {
+    console.log('📧 [EMAIL PLACEHOLDER] Order Modification Email');
+    console.log('To:', email);
+    console.log('Order Number:', modificationData.orderNumber);
+    console.log('Previous Total:', modificationData.previousTotal);
+    console.log('New Total:', modificationData.newTotal);
+    console.log('Amount Difference:', modificationData.amountDifference);
+    console.log('Requires Approval:', modificationData.requiresApproval);
+
+    // Build changes summary
+    const changesSummary = [];
+    if (modificationData.changes.oldAddress && modificationData.changes.newAddress) {
+      changesSummary.push('Shipping address updated');
+    }
+    if (modificationData.changes.quantityChanges && Object.keys(modificationData.changes.quantityChanges).length > 0) {
+      changesSummary.push('Item quantities changed');
+    }
+    if (modificationData.changes.addedItems && modificationData.changes.addedItems.length > 0) {
+      changesSummary.push(`${modificationData.changes.addedItems.length} item(s) added`);
+    }
+    if (modificationData.changes.removedItems && modificationData.changes.removedItems.length > 0) {
+      changesSummary.push(`${modificationData.changes.removedItems.length} item(s) removed`);
+    }
+
+    // Uncomment to actually send emails
+    /*
+    const transporter = createTransporter();
+
+    const mailOptions = {
+      from: process.env.EMAIL_FROM || 'noreply@ecommerce.com',
+      to: email,
+      subject: `Order Modified - ${modificationData.orderNumber}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <h2 style="color: #007bff;">Order Successfully Modified</h2>
+          <p>Your order has been updated as requested.</p>
+
+          <div style="background-color: #f5f5f5; padding: 20px; margin: 20px 0;">
+            <h3>Order Details</h3>
+            <p><strong>Order Number:</strong> ${modificationData.orderNumber}</p>
+            <p><strong>Modification Date:</strong> ${new Date().toLocaleDateString()}</p>
+            ${modificationData.requiresApproval ? '<p style="color: #dc3545;"><strong>Status:</strong> Pending Admin Approval</p>' : ''}
+          </div>
+
+          <div style="margin: 20px 0;">
+            <h3>Changes Made:</h3>
+            <ul>
+              ${changesSummary.map(change => `<li>${change}</li>`).join('')}
+            </ul>
+          </div>
+
+          <div style="background-color: ${modificationData.amountDifference >= 0 ? '#fff3cd' : '#d1ecf1'};
+                      padding: 20px; margin: 20px 0; border-radius: 5px;">
+            <h3>Price Summary</h3>
+            <p><strong>Previous Total:</strong> ₹${modificationData.previousTotal.toFixed(2)}</p>
+            <p><strong>New Total:</strong> ₹${modificationData.newTotal.toFixed(2)}</p>
+            <p><strong style="color: ${modificationData.amountDifference >= 0 ? '#856404' : '#0c5460'};">
+              ${modificationData.amountDifference >= 0 ? 'Additional Amount' : 'Refund Amount'}:
+              ₹${Math.abs(modificationData.amountDifference).toFixed(2)}
+            </strong></p>
+          </div>
+
+          ${modificationData.requiresApproval ? `
+            <div style="background-color: #fff3cd; padding: 15px; margin: 20px 0; border-left: 4px solid #ffc107;">
+              <p><strong>⚠️ Approval Required</strong></p>
+              <p>Your modification includes major changes that require admin approval.
+              You will receive another email once it's reviewed.</p>
+            </div>
+          ` : ''}
+
+          ${modificationData.amountDifference > 0 ? `
+            <div style="background-color: #fff3cd; padding: 15px; margin: 20px 0;">
+              <p><strong>💳 Payment Required</strong></p>
+              <p>Please complete the payment for the additional amount of ₹${modificationData.amountDifference.toFixed(2)}.</p>
+            </div>
+          ` : ''}
+
+          ${modificationData.amountDifference < 0 ? `
+            <div style="background-color: #d1ecf1; padding: 15px; margin: 20px 0;">
+              <p><strong>💰 Refund Initiated</strong></p>
+              <p>A refund of ₹${Math.abs(modificationData.amountDifference).toFixed(2)} will be processed to your original payment method within 5-7 business days.</p>
+            </div>
+          ` : ''}
+
+          <hr style="margin: 30px 0;">
+          <p style="color: #666; font-size: 12px;">
+            This is an automated message, please do not reply to this email.
+            <br>
+            If you did not make this modification, please contact our support team immediately.
+          </p>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+    console.log('Order modification email sent to:', email);
+    */
+
+    return { success: true, message: 'Email logged (placeholder)' };
+  } catch (error) {
+    console.error('Error sending order modification email:', error);
+    throw error;
+  }
+};

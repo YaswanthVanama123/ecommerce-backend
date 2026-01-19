@@ -175,29 +175,6 @@ const orderSchema = new mongoose.Schema({
   deliveredAt: Date,
   cancelledAt: Date,
   cancellationReason: String,
-  // Return management fields
-  returnEligible: {
-    type: Boolean,
-    default: false
-  },
-  returnWindowDays: {
-    type: Number,
-    default: 7
-  },
-  hasReturn: {
-    type: Boolean,
-    default: false
-  },
-  returnStatus: {
-    type: String,
-    enum: ['none', 'requested', 'approved', 'completed', 'rejected'],
-    default: 'none'
-  },
-  returnId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Return',
-    default: null
-  },
   // Enhanced cancellation fields
   cancellationRequest: {
     status: {
@@ -269,16 +246,6 @@ const orderSchema = new mongoose.Schema({
       type: Number,
       default: 7
     }
-  },
-  // Invoice details
-  invoice: {
-    invoiceNumber: {
-      type: String,
-      sparse: true,
-      unique: true
-    },
-    generatedAt: Date,
-    path: String
   }
 }, {
   timestamps: true
@@ -323,7 +290,6 @@ orderSchema.methods.updateStatus = function(newStatus, note = '', actor = null, 
     this.shippingStatus = 'shipped';
   } else if (newStatus === 'delivered') {
     this.deliveredAt = new Date();
-    this.returnEligible = true;
     this.paymentStatus = 'completed';
     this.shippingStatus = 'delivered';
   } else if (newStatus === 'cancelled') {
@@ -351,7 +317,6 @@ orderSchema.methods.updateShippingStatus = function(newShippingStatus, trackingN
   } else if (newShippingStatus === 'delivered' && this.orderStatus === 'shipped') {
     this.orderStatus = 'delivered';
     this.deliveredAt = new Date();
-    this.returnEligible = true;
     this.paymentStatus = 'completed';
     this.statusHistory.push({
       status: 'delivered',

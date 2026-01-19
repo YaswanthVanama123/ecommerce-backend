@@ -13,7 +13,7 @@ import {
   getProductReviews,
   getReviewStats
 } from '../controllers/productController.js';
-import { protect } from '../middleware/auth.js';
+import { protect, optionalAuth } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/roleCheck.js';
 import upload, { processMultipleFiles, handleMulterError } from '../middleware/upload.js';
 import { validate } from '../middleware/validate.js';
@@ -26,7 +26,7 @@ router.get('/featured', getFeaturedProducts);
 router.get('/trending', getTrendingProducts);
 router.get('/categories', getProductCategories); // Add this before /:id route
 router.get('/', validate(productValidator.getProducts, 'query'), getProducts);
-router.get('/:id', validate(productValidator.id, 'params'), getProductById);
+router.get('/:id', optionalAuth, validate(productValidator.id, 'params'), getProductById);
 // Review routes - stats must come before reviews (more specific route first)
 router.get('/:id/reviews/stats', validate(productValidator.id, 'params'), getReviewStats);
 router.get('/:id/reviews', validate(productValidator.id, 'params'), getProductReviews);

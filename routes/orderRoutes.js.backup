@@ -24,15 +24,6 @@ import {
   exportTimelinePDF,
   getTimelineSummary
 } from '../controllers/orderTimelineController.js';
-import {
-  generateInvoice,
-  downloadInvoice,
-  viewInvoice,
-  emailInvoice,
-  getInvoice,
-  regenerateInvoiceForOrder,
-  bulkDownloadInvoicesController
-} from '../controllers/invoiceController.js';
 import { protect } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/roleCheck.js';
 import { validate } from '../middleware/validate.js';
@@ -74,20 +65,5 @@ router.put('/admin/orders/batch/status', protect, isAdmin, batchUpdateOrderStatu
 // Analytics routes (Admin)
 router.get('/admin/analytics/dashboard', protect, isAdmin, getDashboardAnalytics);
 router.get('/admin/analytics/range', protect, isAdmin, getOrderAnalyticsByRange);
-
-// ======================
-// INVOICE ROUTES
-// ======================
-
-// User invoice routes
-router.get('/:id/invoice', protect, getInvoice); // Get invoice details
-router.get('/:id/invoice/download', protect, downloadInvoice); // Download invoice
-router.get('/:id/invoice/view', protect, viewInvoice); // View invoice in browser
-router.post('/:id/invoice/email', protect, emailInvoice); // Email invoice
-router.post('/:id/invoice/generate', protect, generateInvoice); // Generate invoice manually
-
-// Admin invoice routes
-router.post('/:id/invoice/regenerate', protect, isAdmin, regenerateInvoiceForOrder); // Regenerate invoice
-router.post('/invoices/bulk-download', protect, isAdmin, bulkDownloadInvoicesController); // Bulk download
 
 export default router;

@@ -1,5 +1,6 @@
 import Product from '../models/Product.js';
 import Category from '../models/Category.js';
+import Wishlist from '../models/Wishlist.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
 import cloudinary, {
   uploadMultipleFiles,
@@ -33,12 +34,25 @@ export const getProducts = async (req, res, next) => {
     // Build filter object using indexed fields
     const filter = { isActive: true };
 
-    // Category filter - lookup by slug to get ObjectId
+    // Category filter - handle both ObjectId and slug
     if (req.query.category) {
-      const category = await Category.findOne({
-        slug: req.query.category.toLowerCase(),
-        isActive: true
-      }).select('_id').lean();
+      // Check if it's a valid ObjectId (24 hex characters)
+      const isObjectId = /^[0-9a-fA-F]{24}$/.test(req.query.category);
+
+      let category;
+      if (isObjectId) {
+        // If it's an ObjectId, use it directly
+        category = await Category.findOne({
+          _id: req.query.category,
+          isActive: true
+        }).select('_id').lean();
+      } else {
+        // Otherwise, treat it as a slug
+        category = await Category.findOne({
+          slug: req.query.category.toLowerCase(),
+          isActive: true
+        }).select('_id').lean();
+      }
 
       if (category) {
         filter.category = category._id;
@@ -243,33 +257,57 @@ export const getProductById = async (req, res, next) => {
     const cacheKey = `${CACHE_KEYS.PRODUCT}:${req.params.id}`;
 
     // Try to get from cache
-    const cachedProduct = cacheManager.get(cacheKey);
-    if (cachedProduct) {
-      logQueryPerformance('getProductById (cached)', startTime, 1);
-      return sendSuccess(res, 200, cachedProduct, 'Product fetched successfully (cached)');
-    }
-
-    // Cache miss - fetch from database
-    // Optimized query with .lean() and selective population
-    const product = await Product.findById(req.params.id)
-      .populate('category', 'name slug description')
-      .populate({
-        path: 'reviews.user',
-        select: 'firstName lastName avatar' // Only necessary user fields
-      })
-      .lean()
-      .exec();
+    let product = cacheManager.get(cacheKey);
 
     if (!product) {
-      return sendError(res, 404, 'Product not found');
+      // Cache miss - fetch from database
+      // Optimized query with .lean() and selective population
+      product = await Product.findById(req.params.id)
+        .populate('category', 'name slug description')
+        .populate({
+          path: 'reviews.user',
+          select: 'firstName lastName avatar' // Only necessary user fields
+        })
+        .lean()
+        .exec();
+
+      if (!product) {
+        return sendError(res, 404, 'Product not found');
+      }
+
+      // Cache for 15 minutes
+      cacheManager.set(cacheKey, product, TTL.FIFTEEN_MINUTES);
     }
 
-    // Cache for 15 minutes
-    cacheManager.set(cacheKey, product, TTL.FIFTEEN_MINUTES);
+    // Add wishlist information if user is authenticated
+    let isInWishlist = false;
+    console.log('[getProductById] Checking wishlist - req.user:', req.user ? req.user._id : 'null');
+
+    if (req.user && req.user._id) {
+      const wishlist = await Wishlist.findOne({ user: req.user._id })
+        .select('items')
+        .lean()
+        .exec();
+
+      console.log('[getProductById] Wishlist found:', wishlist ? `${wishlist.items.length} items` : 'null');
+
+      if (wishlist) {
+        isInWishlist = wishlist.items.some(
+          item => item.product.toString() === req.params.id.toString()
+        );
+        console.log('[getProductById] isInWishlist:', isInWishlist);
+      }
+    }
+
+    // Add isInWishlist to product response
+    const productWithWishlist = {
+      ...product,
+      isInWishlist
+    };
 
     logQueryPerformance('getProductById', startTime, 1);
 
-    sendSuccess(res, 200, product, 'Product fetched successfully');
+    sendSuccess(res, 200, productWithWishlist, 'Product fetched successfully');
   } catch (error) {
     logQueryPerformance('getProductById (error)', startTime);
     next(error);
@@ -297,9 +335,30 @@ export const getProductBySlug = async (req, res, next) => {
       return sendError(res, 404, 'Product not found');
     }
 
+    // Add wishlist information if user is authenticated
+    let isInWishlist = false;
+    if (req.user && req.user._id) {
+      const wishlist = await Wishlist.findOne({ user: req.user._id })
+        .select('items')
+        .lean()
+        .exec();
+
+      if (wishlist) {
+        isInWishlist = wishlist.items.some(
+          item => item.product.toString() === product._id.toString()
+        );
+      }
+    }
+
+    // Add isInWishlist to product response
+    const productWithWishlist = {
+      ...product,
+      isInWishlist
+    };
+
     logQueryPerformance('getProductBySlug', startTime, 1);
 
-    sendSuccess(res, 200, product, 'Product fetched successfully');
+    sendSuccess(res, 200, productWithWishlist, 'Product fetched successfully');
   } catch (error) {
     logQueryPerformance('getProductBySlug (error)', startTime);
     next(error);

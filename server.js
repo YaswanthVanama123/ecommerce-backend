@@ -1,8 +1,12 @@
 import express from 'express';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+import { createServer } from 'http';
 // import cors from 'cors';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { initializeSocketIO } from './websocket/orderSocket.js';
 import {
   helmetConfig,
   mongoSanitizeMiddleware,
@@ -55,6 +59,11 @@ import bannerRoutes from './routes/bannerRoutes.js';
 import superadminRoutes from './routes/superadminRoutes.js';
 import pincodeRoutes from './routes/pincodeRoutes.js';
 import publicPincodeRoutes from './routes/publicPincodeRoutes.js';
+import settingsRoutes from './routes/settingsRoutes.js';
+import returnRoutes from './routes/returnRoutes.js';
+import shippingRoutes from './routes/shipping.js';
+import analyticsRoutes from './routes/analytics.js';
+import notificationRoutes from './routes/notificationRoutes.js';
 
 dotenv.config();
 
@@ -203,6 +212,14 @@ app.get('/health', (req, res) => {
   });
 });
 
+// ===== PHASE 5: STATIC FILE SERVING =====
+
+// Serve uploaded files (logos, images, etc.)
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+app.use('/uploads', express.static(join(__dirname, 'uploads')));
+
 // API Routes with specific rate limiters
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -210,6 +227,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/returns', returnRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/addresses', addressRoutes);
 app.use('/api/reviews', reviewRoutes);
@@ -217,7 +235,11 @@ app.use('/api/banners', bannerRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/superadmin', superadminRoutes);
 app.use('/api/superadmin/pincodes', pincodeRoutes);
+app.use('/api/superadmin/settings', settingsRoutes);
 app.use('/api/pincode', publicPincodeRoutes);
+app.use('/api/shipping', shippingRoutes);
+app.use('/api/analytics', analyticsRoutes);
+app.use('/api/notifications', notificationRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/temp', tempFixRoute); // Temporary route to fix user roles - REMOVE AFTER USE
 
@@ -239,7 +261,13 @@ app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 
-const server = app.listen(PORT, () => {
+// Create HTTP server
+const httpServer = createServer(app);
+
+// Initialize Socket.IO for real-time order updates
+const io = initializeSocketIO(httpServer);
+
+const server = httpServer.listen(PORT, () => {
   console.log(`
 ╔════════════════════════════════════════════════════════════╗
 ║  E-COMMERCE API SERVER                                     ║
@@ -267,6 +295,7 @@ const server = app.listen(PORT, () => {
 ║  ✓ Slow Query Detection (>100ms)                           ║
 ║  ✓ Memory Usage Tracking                                   ║
 ║  ✓ Request Rate Monitoring                                 ║
+║  ✓ Real-time Order Updates (WebSocket)                     ║
 ╚════════════════════════════════════════════════════════════╝
   `);
 
@@ -297,6 +326,11 @@ const server = app.listen(PORT, () => {
   console.log(`   - Add If-None-Match header to use cached responses`);
   console.log(`   - All responses are compressed automatically`);
   console.log();
+  console.log(`🔌 WebSocket:`);
+  console.log(`   - Real-time order updates enabled`);
+  console.log(`   - Connect with authentication token`);
+  console.log(`   - Events: order:created, order:updated, order:status_changed`);
+  console.log();
 });
 
 // ===== GRACEFUL SHUTDOWN =====
@@ -304,8 +338,16 @@ const server = app.listen(PORT, () => {
 const gracefulShutdown = (signal) => {
   console.log(`\n${signal} received. Starting graceful shutdown...`);
 
+  // Close HTTP server and Socket.IO
   server.close(() => {
     console.log('HTTP server closed.');
+
+    // Close Socket.IO connections
+    if (io) {
+      io.close(() => {
+        console.log('Socket.IO server closed.');
+      });
+    }
 
     // Close database connections
     process.exit(0);
