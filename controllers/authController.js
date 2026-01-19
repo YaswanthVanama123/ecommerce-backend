@@ -42,10 +42,29 @@ export const register = async (req, res, next) => {
       user.refreshToken = refreshToken;
       await user.save();
 
+      // Set tokens in HttpOnly cookies
+      const isProduction = process.env.NODE_ENV === 'production';
+
+      // Set access token cookie
+      res.cookie('accessToken', accessToken, {
+        httpOnly: true, // Prevent JavaScript access
+        secure: isProduction, // HTTPS only in production
+        sameSite: isProduction ? 'strict' : 'lax', // CSRF protection
+        maxAge: 15 * 60 * 1000, // 15 minutes
+        path: '/'
+      });
+
+      // Set refresh token cookie
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'strict' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        path: '/'
+      });
+
       sendSuccess(res, 201, {
-        user: user.toJSON(),
-        accessToken,
-        refreshToken
+        user: user.toJSON()
       }, 'User registered successfully');
     } else {
       return sendError(res, 400, 'Invalid user data');
@@ -89,10 +108,29 @@ export const login = async (req, res, next) => {
     user.refreshToken = refreshToken;
     await user.save();
 
+    // Set tokens in HttpOnly cookies
+    const isProduction = process.env.NODE_ENV === 'production';
+
+    // Set access token cookie
+    res.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      path: '/'
+    });
+
+    // Set refresh token cookie
+    res.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      path: '/'
+    });
+
     sendSuccess(res, 200, {
-      user: user.toJSON(),
-      accessToken,
-      refreshToken
+      user: user.toJSON()
     }, 'Login successful');
   } catch (error) {
     next(error);
@@ -104,7 +142,8 @@ export const login = async (req, res, next) => {
 // @access  Public
 export const refreshToken = async (req, res, next) => {
   try {
-    const { refreshToken } = req.body;
+    // Get refresh token from cookie
+    const refreshToken = req.cookies?.refreshToken;
 
     if (!refreshToken) {
       return sendError(res, 401, 'Refresh token is required');
@@ -127,8 +166,18 @@ export const refreshToken = async (req, res, next) => {
     // Generate new access token
     const newAccessToken = generateAccessToken(user._id, user.role);
 
+    // Set new access token cookie
+    const isProduction = process.env.NODE_ENV === 'production';
+    res.cookie('accessToken', newAccessToken, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      maxAge: 15 * 60 * 1000, // 15 minutes
+      path: '/'
+    });
+
     sendSuccess(res, 200, {
-      accessToken: newAccessToken
+      message: 'Token refreshed successfully'
     }, 'Token refreshed successfully');
   } catch (error) {
     next(error);
@@ -143,6 +192,10 @@ export const logout = async (req, res, next) => {
     // Clear refresh token from database
     req.user.refreshToken = undefined;
     await req.user.save();
+
+    // Clear cookies
+    res.clearCookie('accessToken', { path: '/' });
+    res.clearCookie('refreshToken', { path: '/' });
 
     sendSuccess(res, 200, null, 'Logged out successfully');
   } catch (error) {

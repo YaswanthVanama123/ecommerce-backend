@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice - StyleHub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 650px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background-color: #ffffff;
+            padding: 30px;
+            border-bottom: 3px solid #ec4899;
+        }
+        .header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ec4899;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .invoice-badge {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .invoice-title {
+            font-size: 28px;
+            color: #333333;
+            margin: 0 0 5px 0;
+            font-weight: 600;
+        }
+        .invoice-number {
+            font-size: 16px;
+            color: #666666;
+            margin: 0 0 30px 0;
+        }
+        .info-grid {
+            display: flex;
+            justify-content: space-between;
+            margin: 30px 0;
+        }
+        .info-section {
+            flex: 1;
+        }
+        .info-title {
+            font-size: 13px;
+            color: #999999;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .info-text {
+            font-size: 14px;
+            color: #333333;
+            line-height: 1.6;
+            margin: 3px 0;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+        }
+        .items-table thead {
+            background-color: #fdf2f8;
+        }
+        .items-table th {
+            padding: 15px 12px;
+            text-align: left;
+            font-size: 13px;
+            color: #333333;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .items-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #eeeeee;
+            font-size: 14px;
+            color: #666666;
+        }
+        .items-table tbody tr:last-child td {
+            border-bottom: 2px solid #ec4899;
+        }
+        .summary-section {
+            margin: 30px 0;
+            padding: 0;
+        }
+        .summary-row {
+            display: flex;
+            justify-content: flex-end;
+            margin: 12px 0;
+        }
+        .summary-label {
+            font-size: 14px;
+            color: #666666;
+            width: 200px;
+            text-align: right;
+            padding-right: 30px;
+        }
+        .summary-value {
+            font-size: 14px;
+            color: #333333;
+            font-weight: 600;
+            width: 120px;
+            text-align: right;
+        }
+        .summary-total {
+            border-top: 2px solid #ec4899;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        .summary-total .summary-label,
+        .summary-total .summary-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ec4899;
+        }
+        .payment-info {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .payment-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 8px 0;
+        }
+        .payment-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+        .payment-value {
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        .footer-note {
+            background-color: #fef3c7;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .footer-note p {
+            margin: 0;
+            color: #78350f;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+        .footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #ec4899;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-flex">
+                <h1 class="logo">StyleHub</h1>
+                <div class="invoice-badge">INVOICE</div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2 class="invoice-title">Tax Invoice</h2>
+            <p class="invoice-number">Invoice No: {{invoiceNumber}}</p>
+
+            <!-- Company & Customer Info -->
+            <div class="info-grid">
+                <div class="info-section">
+                    <p class="info-title">From</p>
+                    <p class="info-text" style="font-weight: 600; color: #333333;">StyleHub</p>
+                    <p class="info-text">123 Fashion Street</p>
+                    <p class="info-text">Style City, SC 12345</p>
+                    <p class="info-text">support@stylehub.com</p>
+                    <p class="info-text">+1 (555) 123-4567</p>
+                </div>
+                <div class="info-section">
+                    <p class="info-title">Bill To</p>
+                    <p class="info-text" style="font-weight: 600; color: #333333;">{{billingName}}</p>
+                    <p class="info-text">{{billingAddress}}</p>
+                    <p class="info-text">{{billingCity}}, {{billingState}} {{billingZip}}</p>
+                </div>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-section">
+                    <p class="info-title">Ship To</p>
+                    <p class="info-text" style="font-weight: 600; color: #333333;">{{shippingName}}</p>
+                    <p class="info-text">{{shippingAddress}}</p>
+                    <p class="info-text">{{shippingCity}}, {{shippingState}} {{shippingZip}}</p>
+                </div>
+                <div class="info-section">
+                    <p class="info-title">Invoice Details</p>
+                    <p class="info-text"><strong>Invoice Date:</strong> {{invoiceDate}}</p>
+                    <p class="info-text"><strong>Order No:</strong> #{{orderNumber}}</p>
+                    <p class="info-text"><strong>Order Date:</strong> {{orderDate}}</p>
+                </div>
+            </div>
+
+            <!-- Items Table -->
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Item Description</th>
+                        <th style="text-align: center;">Qty</th>
+                        <th style="text-align: right;">Unit Price</th>
+                        <th style="text-align: right;">Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{itemsList}}
+                </tbody>
+            </table>
+
+            <!-- Summary -->
+            <div class="summary-section">
+                <div class="summary-row">
+                    <span class="summary-label">Subtotal:</span>
+                    <span class="summary-value">{{subtotal}}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Shipping & Handling:</span>
+                    <span class="summary-value">{{shippingCost}}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Tax (GST/VAT):</span>
+                    <span class="summary-value">{{tax}}</span>
+                </div>
+                <div class="summary-row">
+                    <span class="summary-label">Discount:</span>
+                    <span class="summary-value" style="color: #10b981;">-{{discount}}</span>
+                </div>
+                <div class="summary-row summary-total">
+                    <span class="summary-label">Total Amount:</span>
+                    <span class="summary-value">{{totalAmount}}</span>
+                </div>
+            </div>
+
+            <!-- Payment Information -->
+            <div class="payment-info">
+                <p style="font-size: 15px; color: #333333; font-weight: 600; margin: 0 0 15px 0;">Payment Information</p>
+                <div class="payment-row">
+                    <span class="payment-label">Payment Method:</span>
+                    <span class="payment-value">{{paymentMethod}}</span>
+                </div>
+                <div class="payment-row">
+                    <span class="payment-label">Payment Status:</span>
+                    <span class="payment-value" style="color: #10b981;">{{paymentStatus}}</span>
+                </div>
+            </div>
+
+            <!-- Footer Note -->
+            <div class="footer-note">
+                <p>
+                    <strong>Thank you for your business!</strong><br>
+                    If you have any questions about this invoice, please contact our support team.<br>
+                    This is a computer-generated invoice and does not require a signature.
+                </p>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <p style="color: #666666; font-size: 12px; line-height: 1.6;">
+                    <strong>Terms & Conditions:</strong><br>
+                    Payment is due within 30 days. Late payments may incur additional charges.<br>
+                    All sales are subject to our standard terms and conditions.
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="margin: 0 0 10px 0; font-weight: 600;">StyleHub - Fashion Redefined</p>
+            <p style="margin: 0 0 15px 0; color: #cccccc; font-size: 12px;">
+                For questions regarding this invoice, email support@stylehub.com
+            </p>
+            <p style="margin: 20px 0 0 0; color: #999999; font-size: 11px;">
+                © {{currentYear}} StyleHub. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

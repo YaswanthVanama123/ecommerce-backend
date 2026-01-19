@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Order Has Shipped - StyleHub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .shipped-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .title {
+            font-size: 26px;
+            color: #333333;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #666666;
+            margin: 0 0 30px 0;
+            text-align: center;
+        }
+        .tracking-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .tracking-label {
+            font-size: 13px;
+            color: #1e40af;
+            margin: 0 0 8px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        .tracking-number {
+            font-size: 24px;
+            color: #1e3a8a;
+            font-weight: bold;
+            margin: 0 0 15px 0;
+            word-break: break-all;
+        }
+        .carrier-info {
+            font-size: 14px;
+            color: #1e40af;
+            margin: 10px 0 0 0;
+        }
+        .info-grid {
+            display: table;
+            width: 100%;
+            margin: 25px 0;
+        }
+        .info-row {
+            display: table-row;
+        }
+        .info-label {
+            display: table-cell;
+            padding: 10px 15px 10px 0;
+            font-size: 14px;
+            color: #666666;
+            width: 40%;
+        }
+        .info-value {
+            display: table-cell;
+            padding: 10px 0;
+            font-size: 14px;
+            color: #333333;
+            font-weight: 600;
+        }
+        .address-box {
+            background-color: #fafafa;
+            border: 1px solid #eeeeee;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .address-title {
+            font-size: 15px;
+            color: #333333;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+        .address-text {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.6;
+            margin: 3px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        .cta-center {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .timeline {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 8px;
+        }
+        .timeline-title {
+            font-size: 16px;
+            color: #333333;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            position: relative;
+        }
+        .timeline-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+        .timeline-icon.pending {
+            background-color: #d1d5db;
+        }
+        .timeline-text {
+            font-size: 14px;
+            color: #666666;
+        }
+        .info-alert {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .info-alert p {
+            margin: 0;
+            color: #78350f;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #ec4899;
+            text-decoration: none;
+        }
+        .footer-links {
+            margin: 15px 0;
+        }
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="logo">StyleHub</h1>
+            <div class="shipped-badge">📦 Order Shipped</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2 class="title">Great News, {{userName}}!</h2>
+            <p class="subtitle">
+                Your order is on its way to you! 🚚
+            </p>
+
+            <!-- Tracking Information -->
+            <div class="tracking-box">
+                <p class="tracking-label">Tracking Number</p>
+                <p class="tracking-number">{{trackingNumber}}</p>
+                <p class="carrier-info">Carrier: <strong>{{carrier}}</strong></p>
+            </div>
+
+            <div class="cta-center">
+                <a href="{{trackingUrl}}" class="cta-button">Track Your Package</a>
+            </div>
+
+            <!-- Order Details -->
+            <div class="info-grid">
+                <div class="info-row">
+                    <span class="info-label">Order Number:</span>
+                    <span class="info-value">#{{orderNumber}}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Shipped Date:</span>
+                    <span class="info-value">{{shippedDate}}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Estimated Delivery:</span>
+                    <span class="info-value">{{estimatedDelivery}}</span>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <div class="address-box">
+                <p class="address-title">Shipping To:</p>
+                <p class="address-text">{{shippingAddress}}</p>
+                <p class="address-text">{{shippingCity}}, {{shippingState}} {{shippingZip}}</p>
+            </div>
+
+            <!-- Delivery Timeline -->
+            <div class="timeline">
+                <p class="timeline-title">Delivery Progress</p>
+                <div class="timeline-step">
+                    <div class="timeline-icon">✓</div>
+                    <div class="timeline-text">
+                        <strong>Order Confirmed</strong><br>
+                        <span style="color: #999999; font-size: 13px;">Your order was received</span>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon">✓</div>
+                    <div class="timeline-text">
+                        <strong>Order Shipped</strong><br>
+                        <span style="color: #999999; font-size: 13px;">Package is on the way</span>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon pending">○</div>
+                    <div class="timeline-text" style="color: #999999;">
+                        <strong>Out for Delivery</strong><br>
+                        <span style="font-size: 13px;">Package is being delivered</span>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon pending">○</div>
+                    <div class="timeline-text" style="color: #999999;">
+                        <strong>Delivered</strong><br>
+                        <span style="font-size: 13px;">Package has been delivered</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Alert -->
+            <div class="info-alert">
+                <p>
+                    <strong>📍 Delivery Tips:</strong><br>
+                    • Make sure someone is available to receive the package<br>
+                    • Check your tracking link for real-time updates<br>
+                    • Contact us immediately if you notice any issues
+                </p>
+            </div>
+
+            <p style="text-align: center; color: #666666; font-size: 14px; margin: 30px 0;">
+                Questions about your delivery?
+                <a href="{{orderTrackUrl}}" style="color: #ec4899; text-decoration: none; font-weight: 600;">Contact our support team</a>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="margin: 0 0 10px 0; font-weight: 600;">StyleHub - Fashion Redefined</p>
+            <p style="margin: 0 0 15px 0; color: #cccccc; font-size: 12px;">
+                123 Fashion Street, Style City, SC 12345
+            </p>
+
+            <div class="footer-links">
+                <a href="{{trackingUrl}}">Track Package</a> |
+                <a href="#">Contact Support</a> |
+                <a href="#">Delivery Policy</a>
+            </div>
+
+            <p style="margin: 20px 0 0 0; color: #999999; font-size: 11px;">
+                © {{currentYear}} StyleHub. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

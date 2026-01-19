@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Return Request Received - StyleHub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .return-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .title {
+            font-size: 26px;
+            color: #333333;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #666666;
+            margin: 0 0 30px 0;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .return-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        .return-number {
+            text-align: center;
+        }
+        .return-label {
+            font-size: 13px;
+            color: #1e40af;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .return-id {
+            font-size: 24px;
+            color: #1e3a8a;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .return-date {
+            font-size: 14px;
+            color: #1e40af;
+            margin: 5px 0 0 0;
+        }
+        .details-grid {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 12px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+        .detail-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+        .detail-value {
+            font-size: 14px;
+            color: #1e293b;
+            font-weight: 600;
+            text-align: right;
+        }
+        .status-badge {
+            display: inline-block;
+            background-color: #fef3c7;
+            color: #92400e;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .timeline {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #fafafa;
+            border-radius: 8px;
+        }
+        .timeline-title {
+            font-size: 16px;
+            color: #333333;
+            font-weight: 600;
+            margin: 0 0 20px 0;
+            text-align: center;
+        }
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            position: relative;
+        }
+        .timeline-icon {
+            width: 30px;
+            height: 30px;
+            background-color: #3b82f6;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+        .timeline-icon.pending {
+            background-color: #d1d5db;
+        }
+        .timeline-text {
+            font-size: 14px;
+            color: #666666;
+        }
+        .timeline-text.active {
+            color: #333333;
+            font-weight: 600;
+        }
+        .instructions-box {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .instructions-title {
+            font-size: 16px;
+            color: #92400e;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+        .instructions-text {
+            font-size: 14px;
+            color: #78350f;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 14px 35px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 15px 10px;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        .cta-center {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .info-cards {
+            display: flex;
+            justify-content: space-between;
+            margin: 25px 0;
+            flex-wrap: wrap;
+        }
+        .info-card {
+            flex: 1;
+            min-width: 150px;
+            background-color: #ffffff;
+            border: 1px solid #e2e8f0;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .info-card-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+        .info-card-title {
+            font-size: 13px;
+            color: #666666;
+            margin: 5px 0;
+        }
+        .info-card-value {
+            font-size: 16px;
+            color: #333333;
+            font-weight: 600;
+        }
+        .footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #ec4899;
+            text-decoration: none;
+        }
+        .footer-links {
+            margin: 15px 0;
+        }
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="logo">StyleHub</h1>
+            <div class="return-badge">Return Request Received</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2 class="title">Return Request Submitted</h2>
+            <p class="subtitle">
+                Hi {{userName}}, we've received your return request and our team is reviewing it.
+            </p>
+
+            <!-- Return Number -->
+            <div class="return-box">
+                <div class="return-number">
+                    <p class="return-label">Return Number</p>
+                    <p class="return-id">#{{returnNumber}}</p>
+                    <p class="return-date">Submitted on: {{requestDate}}</p>
+                </div>
+            </div>
+
+            <!-- Return Details -->
+            <div class="details-grid">
+                <div class="detail-row">
+                    <span class="detail-label">Order Number:</span>
+                    <span class="detail-value">#{{orderNumber}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Item:</span>
+                    <span class="detail-value">{{itemName}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Quantity:</span>
+                    <span class="detail-value">{{quantity}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Refund Amount:</span>
+                    <span class="detail-value" style="color: #10b981;">{{refundAmount}}</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Status:</span>
+                    <span class="detail-value"><span class="status-badge">{{status}}</span></span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Reason:</span>
+                    <span class="detail-value">{{reason}}</span>
+                </div>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline">
+                <p class="timeline-title">Return Process</p>
+                <div class="timeline-step">
+                    <div class="timeline-icon">✓</div>
+                    <div class="timeline-text active">
+                        <strong>Request Submitted</strong><br>
+                        <span style="color: #999999; font-size: 13px;">Your return request has been received</span>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon pending">⏳</div>
+                    <div class="timeline-text">
+                        <strong>Under Review</strong><br>
+                        <span style="color: #999999; font-size: 13px;">Our team is reviewing your request</span>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon pending">○</div>
+                    <div class="timeline-text">
+                        <strong>Approved</strong><br>
+                        <span style="color: #999999; font-size: 13px;">Return shipping label will be sent</span>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon pending">○</div>
+                    <div class="timeline-text">
+                        <strong>Item Received</strong><br>
+                        <span style="color: #999999; font-size: 13px;">We receive and inspect the item</span>
+                    </div>
+                </div>
+                <div class="timeline-step">
+                    <div class="timeline-icon pending">○</div>
+                    <div class="timeline-text">
+                        <strong>Refund Processed</strong><br>
+                        <span style="color: #999999; font-size: 13px;">Refund is issued to your account</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructions -->
+            <div class="instructions-box">
+                <p class="instructions-title">📦 What Happens Next?</p>
+                <p class="instructions-text">{{instructions}}</p>
+            </div>
+
+            <!-- Info Cards -->
+            <div class="info-cards">
+                <div class="info-card">
+                    <div class="info-card-icon">⏱️</div>
+                    <p class="info-card-title">Review Time</p>
+                    <p class="info-card-value">24-48 hours</p>
+                </div>
+                <div class="info-card">
+                    <div class="info-card-icon">🔄</div>
+                    <p class="info-card-title">Return Window</p>
+                    <p class="info-card-value">30 days</p>
+                </div>
+            </div>
+
+            <div class="cta-center">
+                <a href="{{returnUrl}}" class="cta-button">Track Return Status</a>
+            </div>
+
+            <div style="background-color: #dbeafe; border-left: 4px solid #3b82f6; padding: 20px; margin: 25px 0; border-radius: 4px;">
+                <p style="margin: 0 0 10px 0; color: #1e3a8a; font-weight: 600; font-size: 15px;">
+                    💡 Important Information
+                </p>
+                <ul style="margin: 10px 0; padding-left: 20px; color: #1e40af; font-size: 14px; line-height: 1.8;">
+                    <li>Items must be unused and in original packaging</li>
+                    <li>Include all original tags and accessories</li>
+                    <li>Refund will be processed within 5-7 business days after inspection</li>
+                    <li>Original shipping charges are non-refundable</li>
+                </ul>
+            </div>
+
+            <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 20px; margin: 25px 0; border-radius: 4px;">
+                <p style="margin: 0 0 10px 0; color: #991b1b; font-weight: 600; font-size: 15px;">
+                    ❓ Have Questions?
+                </p>
+                <p style="margin: 0; color: #7f1d1d; font-size: 14px; line-height: 1.6;">
+                    If you have any questions about your return or need assistance, our customer support team is here to help. Use return number <strong>#{{returnNumber}}</strong> when contacting us.
+                </p>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="{{supportUrl}}" style="color: #ef4444; text-decoration: none; font-weight: 600; font-size: 14px;">
+                        Contact Support →
+                    </a>
+                </div>
+            </div>
+
+            <p style="text-align: center; color: #666666; font-size: 14px; margin: 30px 0;">
+                Thank you for shopping with StyleHub!
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="margin: 0 0 10px 0; font-weight: 600;">StyleHub - Fashion Redefined</p>
+            <p style="margin: 0 0 15px 0; color: #cccccc; font-size: 12px;">
+                123 Fashion Street, Style City, SC 12345
+            </p>
+
+            <div class="footer-links">
+                <a href="{{returnUrl}}">Track Return</a> |
+                <a href="{{supportUrl}}">Contact Support</a> |
+                <a href="#">Return Policy</a>
+            </div>
+
+            <p style="margin: 20px 0 0 0; color: #999999; font-size: 11px;">
+                © {{currentYear}} StyleHub. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

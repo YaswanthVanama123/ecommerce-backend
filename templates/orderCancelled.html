@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Cancelled - StyleHub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #64748b 0%, #475569 100%);
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .cancelled-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .title {
+            font-size: 26px;
+            color: #333333;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #666666;
+            margin: 0 0 30px 0;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .order-box {
+            background-color: #f8fafc;
+            border-left: 4px solid #64748b;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        .order-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .order-label {
+            font-size: 14px;
+            color: #64748b;
+        }
+        .order-value {
+            font-size: 16px;
+            color: #1e293b;
+            font-weight: 600;
+        }
+        .refund-box {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border-left: 4px solid #3b82f6;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .refund-title {
+            font-size: 18px;
+            color: #1e3a8a;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+        .refund-amount {
+            font-size: 32px;
+            color: #1e40af;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        .refund-info {
+            font-size: 14px;
+            color: #1e40af;
+            margin: 10px 0 0 0;
+            line-height: 1.6;
+        }
+        .reason-box {
+            background-color: #fef2f2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .reason-box p {
+            margin: 0;
+            color: #7f1d1d;
+            font-size: 14px;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 14px 35px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 15px 10px;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+        }
+        .cta-center {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .help-section {
+            background-color: #fef3c7;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .help-title {
+            font-size: 16px;
+            color: #92400e;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+        .help-text {
+            font-size: 14px;
+            color: #78350f;
+            margin: 0;
+            line-height: 1.6;
+        }
+        .footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #ec4899;
+            text-decoration: none;
+        }
+        .footer-links {
+            margin: 15px 0;
+        }
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="logo">StyleHub</h1>
+            <div class="cancelled-badge">Order Cancelled</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2 class="title">Order Cancelled</h2>
+            <p class="subtitle">
+                Hi {{userName}}, your order has been successfully cancelled.
+            </p>
+
+            <!-- Order Details -->
+            <div class="order-box">
+                <div class="order-info">
+                    <span class="order-label">Order Number:</span>
+                    <span class="order-value">#{{orderNumber}}</span>
+                </div>
+                <div class="order-info">
+                    <span class="order-label">Cancellation Date:</span>
+                    <span class="order-value">{{cancelledDate}}</span>
+                </div>
+            </div>
+
+            <!-- Cancellation Reason -->
+            <div class="reason-box">
+                <p><strong>Reason for Cancellation:</strong></p>
+                <p style="margin-top: 8px;">{{reason}}</p>
+            </div>
+
+            <!-- Refund Information -->
+            <div class="refund-box">
+                <p class="refund-title">💰 Refund Details</p>
+                <p class="refund-amount">{{refundAmount}}</p>
+                <p class="refund-info">
+                    A full refund will be processed to your original payment method ({{paymentMethod}}) within <strong>5-7 business days</strong>. You'll receive a confirmation email once the refund is processed.
+                </p>
+            </div>
+
+            <!-- Help Section -->
+            <div class="help-section">
+                <p class="help-title">Need Assistance?</p>
+                <p class="help-text">
+                    If you have any questions about your cancellation or refund, our customer support team is here to help you 24/7.
+                </p>
+            </div>
+
+            <div class="cta-center">
+                <a href="{{shopUrl}}" class="cta-button">Continue Shopping</a>
+            </div>
+
+            <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; margin: 25px 0; border-radius: 4px;">
+                <p style="margin: 0 0 10px 0; color: #065f46; font-weight: 600; font-size: 15px;">
+                    We Value Your Feedback
+                </p>
+                <p style="margin: 0; color: #047857; font-size: 14px; line-height: 1.6;">
+                    We're sorry to see this order cancelled. If there's anything we could have done better, please let us know. Your feedback helps us improve our service.
+                </p>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="{{supportUrl}}" style="color: #059669; text-decoration: none; font-weight: 600; font-size: 14px;">
+                        Share Feedback →
+                    </a>
+                </div>
+            </div>
+
+            <p style="text-align: center; color: #666666; font-size: 14px; margin: 30px 0;">
+                Changed your mind?
+                <a href="{{shopUrl}}" style="color: #ec4899; text-decoration: none; font-weight: 600;">Browse our latest collection</a>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="margin: 0 0 10px 0; font-weight: 600;">StyleHub - Fashion Redefined</p>
+            <p style="margin: 0 0 15px 0; color: #cccccc; font-size: 12px;">
+                123 Fashion Street, Style City, SC 12345
+            </p>
+
+            <div class="footer-links">
+                <a href="{{shopUrl}}">Shop Now</a> |
+                <a href="{{supportUrl}}">Contact Support</a> |
+                <a href="#">Refund Policy</a>
+            </div>
+
+            <p style="margin: 20px 0 0 0; color: #999999; font-size: 11px;">
+                © {{currentYear}} StyleHub. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

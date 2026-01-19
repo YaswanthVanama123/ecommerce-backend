@@ -8,6 +8,7 @@ import cloudinary, {
   rollbackUploads
 } from '../config/cloudinary.js';
 import cacheManager, { TTL, CACHE_KEYS } from '../utils/cache.js';
+import RecommendationEngine from '../utils/recommendationEngine.js';
 
 // Query performance logging utility
 const logQueryPerformance = (queryName, startTime, resultCount = 0) => {
@@ -1036,5 +1037,216 @@ export const getProductCategories = async (req, res, next) => {
   } catch (error) {
     console.error('Error fetching product categories:', error);
     return sendError(res, 500, 'Failed to fetch categories');
+  }
+};
+
+// RECOMMENDATION ENDPOINTS
+
+// @desc    Get similar products
+// @route   GET /api/products/:id/recommendations
+// @access  Public
+export const getSimilarProducts = async (req, res, next) => {
+  const startTime = Date.now();
+
+  try {
+    const { id } = req.params;
+    const limit = parseInt(req.query.limit) || 8;
+
+    // Check cache first
+    const cacheKey = `${CACHE_KEYS.PRODUCT}:${id}:similar:${limit}`;
+    const cached = cacheManager.get(cacheKey);
+
+    if (cached) {
+      logQueryPerformance('getSimilarProducts (cached)', startTime, cached.length);
+      return sendSuccess(res, 200, { products: cached, count: cached.length }, 'Similar products fetched successfully');
+    }
+
+    // Get similar products
+    const products = await RecommendationEngine.getSimilarProducts(id, limit);
+
+    // Cache for 1 hour
+    cacheManager.set(cacheKey, products, TTL.MEDIUM);
+
+    logQueryPerformance('getSimilarProducts', startTime, products.length);
+
+    sendSuccess(res, 200, { products, count: products.length }, 'Similar products fetched successfully');
+  } catch (error) {
+    logQueryPerformance('getSimilarProducts (error)', startTime);
+    next(error);
+  }
+};
+
+// @desc    Get frequently bought together products
+// @route   GET /api/products/:id/frequently-bought
+// @access  Public
+export const getFrequentlyBoughtTogether = async (req, res, next) => {
+  const startTime = Date.now();
+
+  try {
+    const { id } = req.params;
+    const limit = parseInt(req.query.limit) || 6;
+
+    // Check cache first
+    const cacheKey = `${CACHE_KEYS.PRODUCT}:${id}:bought-together:${limit}`;
+    const cached = cacheManager.get(cacheKey);
+
+    if (cached) {
+      logQueryPerformance('getFrequentlyBoughtTogether (cached)', startTime, cached.length);
+      return sendSuccess(res, 200, { products: cached, count: cached.length }, 'Frequently bought together products fetched successfully');
+    }
+
+    // Get frequently bought together products
+    const products = await RecommendationEngine.getFrequentlyBoughtTogether(id, limit);
+
+    // Cache for 2 hours
+    cacheManager.set(cacheKey, products, TTL.MEDIUM * 2);
+
+    logQueryPerformance('getFrequentlyBoughtTogether', startTime, products.length);
+
+    sendSuccess(res, 200, { products, count: products.length }, 'Frequently bought together products fetched successfully');
+  } catch (error) {
+    logQueryPerformance('getFrequentlyBoughtTogether (error)', startTime);
+    next(error);
+  }
+};
+
+// @desc    Get personalized product recommendations
+// @route   GET /api/products/recommended
+// @access  Private (or Public for guest recommendations)
+export const getPersonalizedRecommendations = async (req, res, next) => {
+  const startTime = Date.now();
+
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    let products = [];
+
+    // If user is authenticated, get personalized recommendations
+    if (req.user) {
+      const userId = req.user._id;
+
+      // Check cache first
+      const cacheKey = `${CACHE_KEYS.PRODUCT}:recommendations:${userId}:${limit}`;
+      const cached = cacheManager.get(cacheKey);
+
+      if (cached) {
+        logQueryPerformance('getPersonalizedRecommendations (cached)', startTime, cached.length);
+        return sendSuccess(res, 200, { products: cached, count: cached.length }, 'Personalized recommendations fetched successfully');
+      }
+
+      // Get personalized recommendations
+      products = await RecommendationEngine.getPersonalizedRecommendations(userId, limit);
+
+      // Cache for 30 minutes
+      cacheManager.set(cacheKey, products, TTL.SHORT * 3);
+    } else {
+      // For guests, return trending products
+      products = await RecommendationEngine.getTrendingProducts(limit);
+    }
+
+    logQueryPerformance('getPersonalizedRecommendations', startTime, products.length);
+
+    sendSuccess(res, 200, { products, count: products.length }, 'Recommendations fetched successfully');
+  } catch (error) {
+    logQueryPerformance('getPersonalizedRecommendations (error)', startTime);
+    next(error);
+  }
+};
+
+// @desc    Get trending products
+// @route   GET /api/products/trending-now
+// @access  Public
+export const getTrendingProductsNow = async (req, res, next) => {
+  const startTime = Date.now();
+
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Check cache first
+    const cacheKey = `${CACHE_KEYS.PRODUCT}:trending:${limit}`;
+    const cached = cacheManager.get(cacheKey);
+
+    if (cached) {
+      logQueryPerformance('getTrendingProductsNow (cached)', startTime, cached.length);
+      return sendSuccess(res, 200, { products: cached, count: cached.length }, 'Trending products fetched successfully');
+    }
+
+    // Get trending products
+    const products = await RecommendationEngine.getTrendingProducts(limit);
+
+    // Cache for 1 hour
+    cacheManager.set(cacheKey, products, TTL.MEDIUM);
+
+    logQueryPerformance('getTrendingProductsNow', startTime, products.length);
+
+    sendSuccess(res, 200, { products, count: products.length }, 'Trending products fetched successfully');
+  } catch (error) {
+    logQueryPerformance('getTrendingProductsNow (error)', startTime);
+    next(error);
+  }
+};
+
+// @desc    Get new arrivals
+// @route   GET /api/products/new-arrivals
+// @access  Public
+export const getNewArrivals = async (req, res, next) => {
+  const startTime = Date.now();
+
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Check cache first
+    const cacheKey = `${CACHE_KEYS.PRODUCT}:new-arrivals:${limit}`;
+    const cached = cacheManager.get(cacheKey);
+
+    if (cached) {
+      logQueryPerformance('getNewArrivals (cached)', startTime, cached.length);
+      return sendSuccess(res, 200, { products: cached, count: cached.length }, 'New arrivals fetched successfully');
+    }
+
+    // Get new arrivals
+    const products = await RecommendationEngine.getNewArrivals(limit);
+
+    // Cache for 1 hour
+    cacheManager.set(cacheKey, products, TTL.MEDIUM);
+
+    logQueryPerformance('getNewArrivals', startTime, products.length);
+
+    sendSuccess(res, 200, { products, count: products.length }, 'New arrivals fetched successfully');
+  } catch (error) {
+    logQueryPerformance('getNewArrivals (error)', startTime);
+    next(error);
+  }
+};
+
+// @desc    Get best sellers
+// @route   GET /api/products/best-sellers
+// @access  Public
+export const getBestSellers = async (req, res, next) => {
+  const startTime = Date.now();
+
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+
+    // Check cache first
+    const cacheKey = `${CACHE_KEYS.PRODUCT}:best-sellers:${limit}`;
+    const cached = cacheManager.get(cacheKey);
+
+    if (cached) {
+      logQueryPerformance('getBestSellers (cached)', startTime, cached.length);
+      return sendSuccess(res, 200, { products: cached, count: cached.length }, 'Best sellers fetched successfully');
+    }
+
+    // Get best sellers
+    const products = await RecommendationEngine.getBestSellers(limit);
+
+    // Cache for 2 hours
+    cacheManager.set(cacheKey, products, TTL.MEDIUM * 2);
+
+    logQueryPerformance('getBestSellers', startTime, products.length);
+
+    sendSuccess(res, 200, { products, count: products.length }, 'Best sellers fetched successfully');
+  } catch (error) {
+    logQueryPerformance('getBestSellers (error)', startTime);
+    next(error);
   }
 };

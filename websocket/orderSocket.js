@@ -19,7 +19,10 @@ export const initializeSocketIO = (server) => {
   // Middleware for authentication
   io.use(async (socket, next) => {
     try {
-      const token = socket.handshake.auth.token;
+      // Try to get token from multiple sources to support different client implementations
+      const token = socket.handshake.auth.token ||
+                    socket.handshake.auth.accessToken ||
+                    socket.handshake.headers.authorization?.replace('Bearer ', '');
 
       if (!token) {
         return next(new Error('Authentication token required'));

@@ -11,6 +11,15 @@ import {
   getRegionalDeliveryAnalytics,
   getTopPerformingCarriers
 } from '../analytics/shippingAnalytics.js';
+import {
+  getDashboardStats,
+  getSalesAnalytics,
+  getRevenueAnalytics,
+  getCustomerAnalytics,
+  getProductAnalytics,
+  getOrderAnalytics,
+  clearAnalyticsCache
+} from '../controllers/analyticsController.js';
 import { authenticateToken, checkRole } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -19,6 +28,65 @@ const router = express.Router();
  * All analytics routes are protected and require authentication
  * Some routes require admin or superadmin role
  */
+
+// ===== ADMIN ANALYTICS ENDPOINTS =====
+
+/**
+ * @route   GET /api/analytics/dashboard
+ * @desc    Get comprehensive dashboard statistics
+ * @access  Admin, Superadmin
+ * @query   startDate, endDate (optional)
+ */
+router.get('/dashboard', authenticateToken, checkRole(['admin', 'superadmin']), getDashboardStats);
+
+/**
+ * @route   GET /api/analytics/sales
+ * @desc    Get sales analytics with time series data
+ * @access  Admin, Superadmin
+ * @query   startDate, endDate, groupBy (day|week|month|year)
+ */
+router.get('/sales', authenticateToken, checkRole(['admin', 'superadmin']), getSalesAnalytics);
+
+/**
+ * @route   GET /api/analytics/revenue
+ * @desc    Get revenue trends and analysis
+ * @access  Admin, Superadmin
+ * @query   startDate, endDate, groupBy (day|week|month)
+ */
+router.get('/revenue', authenticateToken, checkRole(['admin', 'superadmin']), getRevenueAnalytics);
+
+/**
+ * @route   GET /api/analytics/customers
+ * @desc    Get customer analytics and growth metrics
+ * @access  Admin, Superadmin
+ * @query   startDate, endDate, groupBy (day|week|month)
+ */
+router.get('/customers', authenticateToken, checkRole(['admin', 'superadmin']), getCustomerAnalytics);
+
+/**
+ * @route   GET /api/analytics/products
+ * @desc    Get product performance analytics
+ * @access  Admin, Superadmin
+ * @query   startDate, endDate, limit (default: 10)
+ */
+router.get('/products', authenticateToken, checkRole(['admin', 'superadmin']), getProductAnalytics);
+
+/**
+ * @route   GET /api/analytics/orders
+ * @desc    Get order analytics and trends
+ * @access  Admin, Superadmin
+ * @query   startDate, endDate, groupBy (day|week|month)
+ */
+router.get('/orders', authenticateToken, checkRole(['admin', 'superadmin']), getOrderAnalytics);
+
+/**
+ * @route   DELETE /api/analytics/cache
+ * @desc    Clear analytics cache
+ * @access  Admin, Superadmin
+ */
+router.delete('/cache', authenticateToken, checkRole(['admin', 'superadmin']), clearAnalyticsCache);
+
+// ===== SHIPPING ANALYTICS ENDPOINTS =====
 
 /**
  * @route   GET /api/analytics/shipping/overview

@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { createServer } from 'http';
+import cookieParser from 'cookie-parser';
 // import cors from 'cors';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -64,6 +65,15 @@ import returnRoutes from './routes/returnRoutes.js';
 import shippingRoutes from './routes/shipping.js';
 import analyticsRoutes from './routes/analytics.js';
 import notificationRoutes from './routes/notificationRoutes.js';
+import customerRoutes from './routes/customerRoutes.js';
+import invoiceRoutes from './routes/invoiceRoutes.js';
+import adminPaymentRoutes from './routes/adminPaymentRoutes.js';
+import inventoryRoutes from './routes/inventoryRoutes.js';
+import searchRoutes from './routes/searchRoutes.js';
+import seoRoutes from './routes/seoRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
+import emailRoutes from './routes/emailRoutes.js';
+import couponRoutes from './routes/couponRoutes.js';
 
 dotenv.config();
 
@@ -114,75 +124,63 @@ app.use(compressionMiddleware);
 // Sets security headers: CSP, HSTS, X-Frame-Options, etc.
 // app.use(helmetConfig); // Temporarily disabled for development
 
-// 9. CORS - Disabled for development
-// app.use(cors());
-
-// Manual CORS headers - allow everything
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header('Access-Control-Allow-Headers', '*');
-  res.header('Access-Control-Allow-Credentials', 'true');
-
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-
-  next();
-});
+// 9. CORS - Removed (using proxy or same-origin instead)
 
 // ===== PHASE 2: REQUEST PARSING & SIZE LIMITING =====
 
-// 10. Request size limiting (prevent large payload attacks)
+// 10. Cookie Parser - MUST be before any route that uses cookies
+// Parses cookies from request headers and makes them available in req.cookies
+app.use(cookieParser());
+
+// 11. Request size limiting (prevent large payload attacks)
 // Limits request body to 10KB for security
 app.use(requestSizeLimiter);
 app.use(requestUrlLimiter);
 
-// 11. Additional body size validation for specific routes
+// 12. Additional body size validation for specific routes
 app.use(bodyValidationMiddleware);
 
 // ===== PHASE 3: DATA SANITIZATION & SECURITY =====
 
-// 12. Data sanitization middleware (post-parsing)
+// 13. Data sanitization middleware (post-parsing)
 app.use(mongoSanitizeMiddleware); // Prevent NoSQL injection
 app.use(xssMiddleware); // Prevent XSS attacks
 app.use(hppMiddleware); // Prevent HTTP Parameter Pollution
 
-// 13. General API rate limiting (15 minutes, 100 requests per IP)
+// 14. General API rate limiting (15 minutes, 100 requests per IP)
 // Prevents abuse and DDoS attacks
 app.use('/api/', apiLimiter);
 
-// 14. Request body sanitization - additional cleaning
+// 15. Request body sanitization - additional cleaning
 app.use(sanitizeBodyMiddleware);
 
 // ===== PHASE 4: RESPONSE OPTIMIZATION =====
 
-// 15. Cache control headers - sets appropriate caching strategy
+// 16. Cache control headers - sets appropriate caching strategy
 app.use(cacheControlMiddleware);
 
-// 16. ETag support - enables conditional requests with If-None-Match
+// 17. ETag support - enables conditional requests with If-None-Match
 // Returns 304 Not Modified for unchanged resources
 app.use(etagMiddleware);
 
-// 17. Last-Modified support - enables conditional requests with If-Modified-Since
+// 18. Last-Modified support - enables conditional requests with If-Modified-Since
 // Returns 304 Not Modified based on modification time
 app.use(lastModifiedMiddleware);
 
-// 18. Response size monitoring - tracks and logs large responses
+// 19. Response size monitoring - tracks and logs large responses
 app.use(responseSizeMonitor);
 
-// 19. Streaming support - adds helper methods for streaming large datasets
+// 20. Streaming support - adds helper methods for streaming large datasets
 app.use(streamingMiddleware);
 
-// 20. Field filtering - enables partial responses via ?fields= query parameter
+// 21. Field filtering - enables partial responses via ?fields= query parameter
 // Reduces payload size by returning only requested fields
 app.use(fieldFilterMiddleware);
 
-// 21. JSON optimization - removes null/undefined values to reduce payload size
+// 22. JSON optimization - removes null/undefined values to reduce payload size
 app.use(optimizedJsonMiddleware);
 
-// 22. HTTP/2 optimization hints - adds preload hints for related resources
+// 23. HTTP/2 optimization hints - adds preload hints for related resources
 app.use(http2PushMiddleware);
 
 // ===== PHASE 5: APPLICATION ROUTES =====
@@ -240,6 +238,15 @@ app.use('/api/pincode', publicPincodeRoutes);
 app.use('/api/shipping', shippingRoutes);
 app.use('/api/analytics', analyticsRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/admin/customers', customerRoutes);
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/admin/payments', adminPaymentRoutes);
+app.use('/api/admin/inventory', inventoryRoutes);
+app.use('/api/coupons', couponRoutes);
+app.use('/api/search', searchRoutes);
+app.use('/api/seo', seoRoutes);
+app.use('/api/admin/reports', reportRoutes);
+app.use('/api/email', emailRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/temp', tempFixRoute); // Temporary route to fix user roles - REMOVE AFTER USE
 

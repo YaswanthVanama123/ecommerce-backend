@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Delivered - StyleHub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .success-icon {
+            font-size: 60px;
+            margin: 20px 0;
+        }
+        .delivered-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .title {
+            font-size: 28px;
+            color: #333333;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+            text-align: center;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #666666;
+            margin: 0 0 30px 0;
+            text-align: center;
+            line-height: 1.6;
+        }
+        .order-box {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border-left: 4px solid #10b981;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .order-label {
+            font-size: 13px;
+            color: #047857;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .order-number {
+            font-size: 22px;
+            color: #065f46;
+            font-weight: bold;
+            margin: 8px 0;
+        }
+        .delivery-date {
+            font-size: 14px;
+            color: #047857;
+            margin: 8px 0 0 0;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 16px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 15px 10px;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+        }
+        .cta-button.secondary {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        .cta-center {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .feedback-section {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 25px;
+            margin: 30px 0;
+            border-radius: 8px;
+        }
+        .feedback-title {
+            font-size: 18px;
+            color: #92400e;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+        .feedback-text {
+            font-size: 14px;
+            color: #78350f;
+            margin: 0 0 20px 0;
+            line-height: 1.6;
+        }
+        .stars {
+            font-size: 30px;
+            color: #f59e0b;
+            text-align: center;
+            margin: 15px 0;
+        }
+        .feature-grid {
+            display: flex;
+            justify-content: space-around;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+        .feature-item {
+            text-align: center;
+            flex: 1;
+            min-width: 150px;
+            margin: 10px;
+        }
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .feature-title {
+            font-size: 14px;
+            color: #333333;
+            font-weight: 600;
+            margin: 5px 0;
+        }
+        .feature-text {
+            font-size: 12px;
+            color: #666666;
+        }
+        .divider {
+            border: 0;
+            border-top: 1px solid #eeeeee;
+            margin: 30px 0;
+        }
+        .footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #ec4899;
+            text-decoration: none;
+        }
+        .footer-links {
+            margin: 15px 0;
+        }
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="logo">StyleHub</h1>
+            <div class="success-icon">✓</div>
+            <div class="delivered-badge">Successfully Delivered</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2 class="title">Your Order Has Been Delivered!</h2>
+            <p class="subtitle">
+                Hi {{userName}}, we hope you love your new items! Your package has been successfully delivered.
+            </p>
+
+            <!-- Order Info -->
+            <div class="order-box">
+                <p class="order-label">Order Number</p>
+                <p class="order-number">#{{orderNumber}}</p>
+                <p class="delivery-date">Delivered on: {{deliveredDate}}</p>
+            </div>
+
+            <!-- Review Section -->
+            <div class="feedback-section">
+                <p class="feedback-title">How Was Your Experience? ⭐</p>
+                <p class="feedback-text">
+                    Your opinion matters to us! Share your thoughts about the products and help other customers make informed decisions.
+                </p>
+                <div class="stars">★ ★ ★ ★ ★</div>
+                <div style="text-align: center;">
+                    <a href="{{reviewUrl}}" class="cta-button">Write a Review</a>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="cta-center">
+                <a href="{{orderUrl}}" class="cta-button secondary">View Order Details</a>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Features -->
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">🔄</div>
+                    <p class="feature-title">Easy Returns</p>
+                    <p class="feature-text">30-day return window</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">💬</div>
+                    <p class="feature-title">24/7 Support</p>
+                    <p class="feature-text">We're here to help</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🎁</div>
+                    <p class="feature-title">Rewards</p>
+                    <p class="feature-text">Earn points on purchases</p>
+                </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Issue Section -->
+            <div style="background-color: #fef2f2; border-left: 4px solid #ef4444; padding: 20px; margin: 25px 0; border-radius: 4px;">
+                <p style="margin: 0 0 10px 0; color: #991b1b; font-weight: 600; font-size: 15px;">
+                    Something Wrong with Your Order?
+                </p>
+                <p style="margin: 0; color: #7f1d1d; font-size: 14px; line-height: 1.6;">
+                    If there's any issue with your order, damaged items, or missing products, please let us know immediately. We're here to make it right!
+                </p>
+                <div style="text-align: center; margin-top: 15px;">
+                    <a href="{{supportUrl}}" style="color: #ef4444; text-decoration: none; font-weight: 600; font-size: 14px;">
+                        Contact Support →
+                    </a>
+                </div>
+            </div>
+
+            <p style="text-align: center; color: #666666; font-size: 14px; margin: 30px 0; line-height: 1.6;">
+                Thank you for choosing StyleHub! We can't wait to serve you again.
+                <br>
+                <a href="{{orderUrl}}" style="color: #ec4899; text-decoration: none; font-weight: 600;">Continue Shopping</a>
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="margin: 0 0 10px 0; font-weight: 600;">StyleHub - Fashion Redefined</p>
+            <p style="margin: 0 0 15px 0; color: #cccccc; font-size: 12px;">
+                123 Fashion Street, Style City, SC 12345
+            </p>
+
+            <div class="footer-links">
+                <a href="{{orderUrl}}">My Orders</a> |
+                <a href="{{reviewUrl}}">Leave Review</a> |
+                <a href="{{supportUrl}}">Contact Support</a>
+            </div>
+
+            <p style="margin: 20px 0 0 0; color: #999999; font-size: 11px;">
+                © {{currentYear}} StyleHub. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

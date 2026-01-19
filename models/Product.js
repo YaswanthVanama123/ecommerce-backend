@@ -95,6 +95,22 @@ const productSchema = new mongoose.Schema({
       message: "HSN code must be 4 to 8 digits"
     }
   },
+  // Inventory management fields
+  lowStockThreshold: {
+    type: Number,
+    default: 10,
+    min: 0
+  },
+  reorderPoint: {
+    type: Number,
+    default: 20,
+    min: 0
+  },
+  reorderQuantity: {
+    type: Number,
+    default: 50,
+    min: 0
+  },
   isFeatured: {
     type: Boolean,
     default: false
@@ -149,6 +165,63 @@ productSchema.methods.updateRatings = function() {
     const total = this.reviews.reduce((sum, review) => sum + review.rating, 0);
     this.ratings.average = parseFloat((total / this.reviews.length).toFixed(1));
     this.ratings.count = this.reviews.length;
+  }
+};
+
+// Get total stock quantity across all variants
+productSchema.methods.getTotalStock = function() {
+  return this.stock.reduce((total, item) => total + item.quantity, 0);
+};
+
+// Check if product is low on stock
+productSchema.methods.isLowStock = function() {
+  const totalStock = this.getTotalStock();
+  return totalStock <= this.lowStockThreshold && totalStock > 0;
+};
+
+// Check if product is out of stock
+productSchema.methods.isOutOfStock = function() {
+  const totalStock = this.getTotalStock();
+  return totalStock === 0;
+};
+
+// Check if product needs reorder
+productSchema.methods.needsReorder = function() {
+  const totalStock = this.getTotalStock();
+  return totalStock <= this.reorderPoint;
+};
+
+// Get stock for specific size and color
+productSchema.methods.getStockForVariant = function(size, color) {
+  const stockItem = this.stock.find(
+    s => s.size === size && s.color === color
+  );
+  return stockItem ? stockItem.quantity : 0;
+};
+
+// Update stock for specific size and color
+productSchema.methods.updateStock = function(size, color, quantity) {
+  const stockItem = this.stock.find(
+    s => s.size === size && s.color === color
+  );
+
+  if (stockItem) {
+    stockItem.quantity = Math.max(0, quantity);
+  } else {
+    this.stock.push({ size, color, quantity: Math.max(0, quantity) });
+  }
+};
+
+// Adjust stock (add or remove)
+productSchema.methods.adjustStock = function(size, color, adjustment) {
+  const stockItem = this.stock.find(
+    s => s.size === size && s.color === color
+  );
+
+  if (stockItem) {
+    stockItem.quantity = Math.max(0, stockItem.quantity + adjustment);
+  } else if (adjustment > 0) {
+    this.stock.push({ size, color, quantity: adjustment });
   }
 };
 

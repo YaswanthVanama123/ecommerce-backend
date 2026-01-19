@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Confirmation - StyleHub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            padding: 30px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .success-badge {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .title {
+            font-size: 26px;
+            color: #333333;
+            margin: 0 0 10px 0;
+            font-weight: 600;
+        }
+        .subtitle {
+            font-size: 15px;
+            color: #666666;
+            margin: 0 0 25px 0;
+        }
+        .order-number-box {
+            background: linear-gradient(135deg, #fdf2f8 0%, #fce7f3 100%);
+            border-left: 4px solid #ec4899;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        .order-number {
+            font-size: 14px;
+            color: #666666;
+            margin: 0 0 5px 0;
+        }
+        .order-number-value {
+            font-size: 22px;
+            color: #ec4899;
+            font-weight: bold;
+            margin: 0;
+        }
+        .order-date {
+            font-size: 13px;
+            color: #888888;
+            margin: 10px 0 0 0;
+        }
+        .section-title {
+            font-size: 18px;
+            color: #333333;
+            margin: 30px 0 15px 0;
+            font-weight: 600;
+            border-bottom: 2px solid #ec4899;
+            padding-bottom: 8px;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .items-table th {
+            background-color: #fdf2f8;
+            padding: 12px;
+            text-align: left;
+            font-size: 14px;
+            color: #333333;
+            font-weight: 600;
+        }
+        .items-table td {
+            padding: 15px 12px;
+            border-bottom: 1px solid #eeeeee;
+            font-size: 14px;
+            color: #666666;
+        }
+        .price-summary {
+            background-color: #fafafa;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #666666;
+        }
+        .price-row.total {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333333;
+            border-top: 2px solid #ec4899;
+            padding-top: 15px;
+            margin-top: 15px;
+        }
+        .info-box {
+            background-color: #ffffff;
+            border: 1px solid #eeeeee;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .info-box-title {
+            font-size: 15px;
+            color: #333333;
+            font-weight: 600;
+            margin: 0 0 10px 0;
+        }
+        .info-box-text {
+            font-size: 14px;
+            color: #666666;
+            line-height: 1.6;
+            margin: 5px 0;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 14px 35px;
+            border-radius: 25px;
+            font-size: 15px;
+            font-weight: 600;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+        }
+        .cta-center {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #ec4899;
+            text-decoration: none;
+        }
+        .footer-links {
+            margin: 15px 0;
+        }
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="logo">StyleHub</h1>
+            <div class="success-badge">✓ Order Confirmed</div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2 class="title">Thank You for Your Order, {{userName}}!</h2>
+            <p class="subtitle">
+                We've received your order and it's being processed. You'll receive a shipping confirmation email with tracking details once your items are on their way.
+            </p>
+
+            <div class="order-number-box">
+                <p class="order-number">Order Number</p>
+                <p class="order-number-value">#{{orderNumber}}</p>
+                <p class="order-date">Order Date: {{orderDate}}</p>
+            </div>
+
+            <!-- Order Items -->
+            <h3 class="section-title">Order Items</h3>
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th style="text-align: right;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{itemsList}}
+                </tbody>
+            </table>
+
+            <!-- Price Summary -->
+            <div class="price-summary">
+                <div class="price-row">
+                    <span>Subtotal:</span>
+                    <span>{{subtotal}}</span>
+                </div>
+                <div class="price-row">
+                    <span>Shipping:</span>
+                    <span>{{shippingCost}}</span>
+                </div>
+                <div class="price-row">
+                    <span>Tax:</span>
+                    <span>{{tax}}</span>
+                </div>
+                <div class="price-row">
+                    <span>Discount:</span>
+                    <span style="color: #10b981;">-{{discount}}</span>
+                </div>
+                <div class="price-row total">
+                    <span>Total:</span>
+                    <span style="color: #ec4899;">{{totalAmount}}</span>
+                </div>
+            </div>
+
+            <!-- Shipping Address -->
+            <h3 class="section-title">Shipping Address</h3>
+            <div class="info-box">
+                <p class="info-box-text" style="font-weight: 600; color: #333333;">{{shippingName}}</p>
+                <p class="info-box-text">{{shippingAddress}}</p>
+                <p class="info-box-text">{{shippingAddress2}}</p>
+                <p class="info-box-text">{{shippingCity}}, {{shippingState}} {{shippingZip}}</p>
+                <p class="info-box-text">Phone: {{shippingPhone}}</p>
+            </div>
+
+            <!-- Payment Method -->
+            <h3 class="section-title">Payment Method</h3>
+            <div class="info-box">
+                <p class="info-box-text">{{paymentMethod}}</p>
+            </div>
+
+            <div class="cta-center">
+                <a href="{{orderTrackUrl}}" class="cta-button">Track Your Order</a>
+            </div>
+
+            <div style="background-color: #e0f2fe; border-left: 4px solid #0284c7; padding: 15px; margin: 25px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #0c4a6e; font-size: 14px;">
+                    <strong>📦 What's Next?</strong><br>
+                    We're preparing your order for shipment. You'll receive another email with tracking information once your order ships. Estimated delivery is 3-5 business days.
+                </p>
+            </div>
+
+            <p style="text-align: center; color: #666666; font-size: 14px; margin: 30px 0;">
+                Have questions about your order?
+                <a href="{{orderTrackUrl}}" style="color: #ec4899; text-decoration: none; font-weight: 600;">Visit your order page</a>
+                or contact our support team.
+            </p>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="margin: 0 0 10px 0; font-weight: 600;">StyleHub - Fashion Redefined</p>
+            <p style="margin: 0 0 15px 0; color: #cccccc; font-size: 12px;">
+                123 Fashion Street, Style City, SC 12345
+            </p>
+
+            <div class="footer-links">
+                <a href="#">Track Order</a> |
+                <a href="#">Contact Support</a> |
+                <a href="#">Return Policy</a>
+            </div>
+
+            <p style="margin: 20px 0 0 0; color: #999999; font-size: 11px;">
+                © {{currentYear}} StyleHub. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

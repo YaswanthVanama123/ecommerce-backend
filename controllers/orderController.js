@@ -4,6 +4,8 @@ import Cart from '../models/Cart.js';
 import Product from '../models/Product.js';
 import User from '../models/User.js';
 import Shipping from '../models/Shipping.js';
+import Coupon from '../models/Coupon.js';
+import InventoryAdjustment from '../models/InventoryAdjustment.js';
 import { sendSuccess, sendError } from '../utils/apiResponse.js';
 import {
   sendOrderConfirmationEmail,
@@ -45,13 +47,13 @@ export const createOrder = async (req, res, next) => {
   try {
     session.startTransaction();
 
-    const { shippingAddressId, paymentMethod } = req.body;
+    const { shippingAddressId, paymentMethod, couponCode } = req.body;
 
     // Get user's cart with populated products using lean for better performance
     const cart = await Cart.findOne({ user: req.user._id })
       .populate({
         path: 'items.product',
-        select: 'name images price discountPrice isActive stock'
+        select: 'name images price discountPrice isActive stock category'
       })
       .session(session);
 
@@ -111,11 +113,18 @@ export const createOrder = async (req, res, next) => {
     // Prepare order items
     const orderItems = [];
     let itemsTotal = 0;
+    const productIds = [];
+    const categoryIds = [];
 
     for (const { product, cartItem } of stockValidations) {
       const effectivePrice = product.discountPrice || product.price;
       const itemPrice = effectivePrice * cartItem.quantity;
       itemsTotal += itemPrice;
+
+      productIds.push(product._id);
+      if (product.category) {
+        categoryIds.push(product.category);
+      }
 
       orderItems.push({
         product: product._id,
@@ -132,10 +141,47 @@ export const createOrder = async (req, res, next) => {
     // Calculate totals
     const shippingCharge = itemsTotal > 500 ? 0 : 50;
     const tax = Math.round(itemsTotal * 0.18); // 18% GST
-    const totalAmount = itemsTotal + shippingCharge + tax;
+    let totalAmount = itemsTotal + shippingCharge + tax;
+
+    // Handle coupon application
+    let appliedCouponData = null;
+    let couponDiscount = 0;
+
+    if (couponCode) {
+      const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() }).session(session);
+
+      if (!coupon) {
+        await session.abortTransaction();
+        return sendError(res, 404, 'Invalid coupon code');
+      }
+
+      // Validate coupon for the order
+      const validation = coupon.validateForOrder(itemsTotal, productIds, categoryIds);
+
+      if (!validation.isValid) {
+        await session.abortTransaction();
+        return sendError(res, 400, validation.errors[0] || 'Coupon is not valid');
+      }
+
+      // Calculate discount
+      couponDiscount = coupon.calculateDiscount(itemsTotal);
+      totalAmount = totalAmount - couponDiscount;
+
+      // Increment coupon usage
+      await coupon.incrementUsage();
+
+      // Store coupon data for order
+      appliedCouponData = {
+        couponId: coupon._id,
+        code: coupon.code,
+        type: coupon.type,
+        value: coupon.value,
+        discountAmount: couponDiscount
+      };
+    }
 
     // Create order
-    const order = await Order.create([{
+    const orderData = {
       user: req.user._id,
       items: orderItems,
       shippingAddress: {
@@ -154,7 +200,15 @@ export const createOrder = async (req, res, next) => {
       shippingCharge,
       tax,
       totalAmount
-    }], { session });
+    };
+
+    // Add coupon data if applied
+    if (appliedCouponData) {
+      orderData.appliedCoupon = appliedCouponData;
+      orderData.discount = couponDiscount;
+    }
+
+    const order = await Order.create([orderData], { session });
 
     // Batch update product stock using bulkWrite for efficiency
     const bulkStockOperations = [];
@@ -176,6 +230,34 @@ export const createOrder = async (req, res, next) => {
 
     if (bulkStockOperations.length > 0) {
       await Product.bulkWrite(bulkStockOperations, { session });
+    }
+
+    // Log inventory adjustments for each stock update
+    const inventoryAdjustmentLogs = [];
+    for (const [key, stockInfo] of productStockMap.entries()) {
+      const product = await Product.findById(stockInfo.productId).session(session);
+      const stockItem = product.stock.find(
+        s => s.size === stockInfo.size && s.color === stockInfo.color
+      );
+
+      inventoryAdjustmentLogs.push({
+        product: stockInfo.productId,
+        productName: product.name,
+        size: stockInfo.size,
+        color: stockInfo.color,
+        adjustmentType: 'sale',
+        previousQuantity: stockItem.quantity + stockInfo.quantity,
+        adjustmentQuantity: -stockInfo.quantity,
+        newQuantity: stockItem.quantity,
+        reason: 'Order placed',
+        adjustedBy: req.user._id,
+        adjustedByName: req.user.name || `${user.firstName} ${user.lastName}`,
+        reference: order[0]._id.toString()
+      });
+    }
+
+    if (inventoryAdjustmentLogs.length > 0) {
+      await InventoryAdjustment.insertMany(inventoryAdjustmentLogs, { session });
     }
 
     // Clear cart efficiently

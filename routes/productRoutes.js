@@ -11,7 +11,13 @@ import {
   uploadImages,
   addReview,
   getProductReviews,
-  getReviewStats
+  getReviewStats,
+  getSimilarProducts,
+  getFrequentlyBoughtTogether,
+  getPersonalizedRecommendations,
+  getTrendingProductsNow,
+  getNewArrivals,
+  getBestSellers
 } from '../controllers/productController.js';
 import { protect, optionalAuth } from '../middleware/auth.js';
 import { isAdmin } from '../middleware/roleCheck.js';
@@ -24,9 +30,18 @@ const router = express.Router();
 // Specific routes MUST come before dynamic routes
 router.get('/featured', getFeaturedProducts);
 router.get('/trending', getTrendingProducts);
-router.get('/categories', getProductCategories); // Add this before /:id route
+router.get('/categories', getProductCategories);
+// Recommendation endpoints (must be before /:id route)
+router.get('/recommended', optionalAuth, getPersonalizedRecommendations);
+router.get('/trending-now', getTrendingProductsNow);
+router.get('/new-arrivals', getNewArrivals);
+router.get('/best-sellers', getBestSellers);
+// Main product routes
 router.get('/', validate(productValidator.getProducts, 'query'), getProducts);
 router.get('/:id', optionalAuth, validate(productValidator.id, 'params'), getProductById);
+// Product-specific recommendation routes
+router.get('/:id/recommendations', validate(productValidator.id, 'params'), getSimilarProducts);
+router.get('/:id/frequently-bought', validate(productValidator.id, 'params'), getFrequentlyBoughtTogether);
 // Review routes - stats must come before reviews (more specific route first)
 router.get('/:id/reviews/stats', validate(productValidator.id, 'params'), getReviewStats);
 router.get('/:id/reviews', validate(productValidator.id, 'params'), getProductReviews);

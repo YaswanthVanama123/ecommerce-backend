@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to StyleHub</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Arial', 'Helvetica', sans-serif;
+            background-color: #f4f4f4;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+        }
+        .header {
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            padding: 40px 20px;
+            text-align: center;
+        }
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: 1px;
+        }
+        .content {
+            padding: 40px 30px;
+        }
+        .welcome-title {
+            font-size: 28px;
+            color: #333333;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+        }
+        .welcome-text {
+            font-size: 16px;
+            color: #666666;
+            line-height: 1.6;
+            margin: 0 0 25px 0;
+        }
+        .benefit-box {
+            background-color: #fdf2f8;
+            border-left: 4px solid #ec4899;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 4px;
+        }
+        .benefit-item {
+            display: flex;
+            align-items: center;
+            margin: 12px 0;
+            font-size: 15px;
+            color: #444444;
+        }
+        .benefit-icon {
+            width: 24px;
+            height: 24px;
+            background-color: #ec4899;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: #ffffff;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 15px 40px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0;
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.3);
+        }
+        .cta-center {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .divider {
+            border: 0;
+            border-top: 1px solid #eeeeee;
+            margin: 30px 0;
+        }
+        .social-section {
+            text-align: center;
+            padding: 30px 20px;
+            background-color: #fafafa;
+        }
+        .social-title {
+            font-size: 16px;
+            color: #333333;
+            margin: 0 0 15px 0;
+            font-weight: 600;
+        }
+        .social-links {
+            margin: 15px 0;
+        }
+        .social-link {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            margin: 0 8px;
+            background-color: #ec4899;
+            border-radius: 50%;
+            color: #ffffff;
+            text-decoration: none;
+            line-height: 40px;
+            font-size: 18px;
+        }
+        .footer {
+            background-color: #333333;
+            color: #ffffff;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 13px;
+        }
+        .footer a {
+            color: #ec4899;
+            text-decoration: none;
+        }
+        .footer-links {
+            margin: 15px 0;
+        }
+        .footer-links a {
+            color: #ffffff;
+            text-decoration: none;
+            margin: 0 10px;
+            font-size: 12px;
+        }
+        .unsubscribe {
+            color: #999999;
+            font-size: 11px;
+            margin-top: 15px;
+        }
+        .unsubscribe a {
+            color: #999999;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <!-- Header -->
+        <div class="header">
+            <h1 class="logo">StyleHub</h1>
+            <p style="color: #ffffff; margin: 10px 0 0 0; font-size: 14px;">Your Fashion Destination</p>
+        </div>
+
+        <!-- Main Content -->
+        <div class="content">
+            <h2 class="welcome-title">Welcome to StyleHub, {{userName}}! 🎉</h2>
+
+            <p class="welcome-text">
+                We're thrilled to have you join our fashion-forward community! Your account has been successfully created, and you're now part of the StyleHub family.
+            </p>
+
+            <p class="welcome-text">
+                Get ready to discover the latest trends, exclusive collections, and amazing deals tailored just for you.
+            </p>
+
+            <div class="benefit-box">
+                <div class="benefit-item">
+                    <span class="benefit-icon">✓</span>
+                    <span>Exclusive access to new arrivals and limited editions</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✓</span>
+                    <span>Personalized recommendations based on your style</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✓</span>
+                    <span>Early notifications about sales and special offers</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✓</span>
+                    <span>Easy returns and exchanges within 30 days</span>
+                </div>
+                <div class="benefit-item">
+                    <span class="benefit-icon">✓</span>
+                    <span>24/7 customer support for all your needs</span>
+                </div>
+            </div>
+
+            <div class="cta-center">
+                <a href="{{shopUrl}}" class="cta-button">Start Shopping Now</a>
+            </div>
+
+            <hr class="divider">
+
+            <p class="welcome-text" style="text-align: center;">
+                Need help getting started? Visit your
+                <a href="{{accountUrl}}" style="color: #ec4899; text-decoration: none; font-weight: 600;">Account Dashboard</a>
+                to update your preferences and manage your orders.
+            </p>
+        </div>
+
+        <!-- Social Media Section -->
+        <div class="social-section">
+            <h3 class="social-title">Follow Us on Social Media</h3>
+            <p style="color: #666666; font-size: 14px; margin: 0 0 15px 0;">
+                Stay updated with the latest trends and exclusive offers
+            </p>
+            <div class="social-links">
+                <a href="https://facebook.com/stylehub" class="social-link">f</a>
+                <a href="https://instagram.com/stylehub" class="social-link">📷</a>
+                <a href="https://twitter.com/stylehub" class="social-link">🐦</a>
+                <a href="https://pinterest.com/stylehub" class="social-link">P</a>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p style="margin: 0 0 10px 0; font-weight: 600;">StyleHub - Fashion Redefined</p>
+            <p style="margin: 0 0 15px 0; color: #cccccc; font-size: 12px;">
+                123 Fashion Street, Style City, SC 12345
+            </p>
+
+            <div class="footer-links">
+                <a href="{{shopUrl}}/about">About Us</a> |
+                <a href="{{shopUrl}}/contact">Contact</a> |
+                <a href="{{shopUrl}}/privacy">Privacy Policy</a> |
+                <a href="{{shopUrl}}/terms">Terms of Service</a>
+            </div>
+
+            <p class="unsubscribe">
+                You're receiving this email because you signed up for a StyleHub account.
+                <br>
+                <a href="{{shopUrl}}/unsubscribe">Unsubscribe from marketing emails</a>
+            </p>
+
+            <p style="margin: 20px 0 0 0; color: #999999; font-size: 11px;">
+                © {{currentYear}} StyleHub. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

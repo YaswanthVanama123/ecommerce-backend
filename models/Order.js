@@ -138,6 +138,30 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  appliedCoupon: {
+    couponId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Coupon',
+      default: null
+    },
+    code: {
+      type: String,
+      default: null
+    },
+    type: {
+      type: String,
+      enum: ['percentage', 'fixed'],
+      default: null
+    },
+    value: {
+      type: Number,
+      default: null
+    },
+    discountAmount: {
+      type: Number,
+      default: 0
+    }
+  },
   shippingCharge: {
     type: Number,
     default: 0
