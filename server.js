@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import { createServer } from 'http';
 import cookieParser from 'cookie-parser';
-// import cors from 'cors';
+import cors from 'cors';
 import connectDB from './config/db.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { initializeSocketIO } from './websocket/orderSocket.js';
@@ -74,6 +74,7 @@ import seoRoutes from './routes/seoRoutes.js';
 import reportRoutes from './routes/reportRoutes.js';
 import emailRoutes from './routes/emailRoutes.js';
 import couponRoutes from './routes/couponRoutes.js';
+import deliveryRoutes from './routes/deliveryRoutes.js';
 
 dotenv.config();
 
@@ -124,7 +125,22 @@ app.use(compressionMiddleware);
 // Sets security headers: CSP, HSTS, X-Frame-Options, etc.
 // app.use(helmetConfig); // Temporarily disabled for development
 
-// 9. CORS - Removed (using proxy or same-origin instead)
+// 9. CORS configuration - allow requests from all webapps
+const corsOptions = {
+  origin: [
+    'http://localhost:5173', // user-webapp / superadmin-webapp
+    'http://localhost:5174', // admin-webapp / delivery-webapp
+    'http://localhost:5175', // fallback port
+    'http://localhost:5176', // fallback port
+    'http://localhost:3000', // common alternative port
+  ],
+  credentials: true, // Allow cookies to be sent
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['X-Response-Time', 'X-RateLimit-Limit', 'X-RateLimit-Remaining'],
+  maxAge: 86400, // 24 hours
+};
+app.use(cors(corsOptions));
 
 // ===== PHASE 2: REQUEST PARSING & SIZE LIMITING =====
 
@@ -247,6 +263,7 @@ app.use('/api/search', searchRoutes);
 app.use('/api/seo', seoRoutes);
 app.use('/api/admin/reports', reportRoutes);
 app.use('/api/email', emailRoutes);
+app.use('/api/delivery', deliveryRoutes);
 app.use('/api/health', healthRoutes);
 app.use('/api/temp', tempFixRoute); // Temporary route to fix user roles - REMOVE AFTER USE
 

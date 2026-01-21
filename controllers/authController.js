@@ -64,7 +64,9 @@ export const register = async (req, res, next) => {
       });
 
       sendSuccess(res, 201, {
-        user: user.toJSON()
+        user: user.toJSON(),
+        accessToken,
+        refreshToken
       }, 'User registered successfully');
     } else {
       return sendError(res, 400, 'Invalid user data');
@@ -130,7 +132,9 @@ export const login = async (req, res, next) => {
     });
 
     sendSuccess(res, 200, {
-      user: user.toJSON()
+      user: user.toJSON(),
+      accessToken,
+      refreshToken
     }, 'Login successful');
   } catch (error) {
     next(error);
